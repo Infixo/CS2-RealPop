@@ -9,9 +9,9 @@
 
 	<PropertyGroup>
 		<TargetFramework>netstandard2.1</TargetFramework>
-		<AssemblyName>MyCoolMod</AssemblyName>
-		<RootNamespace>MyCoolMod</RootNamespace>
-		<Description>A mod that I made for Cities: Skylines 2</Description>
+		<AssemblyName>RealPopMod</AssemblyName>
+		<RootNamespace>RealPop</RootNamespace>
+		<Description>Realistic Population and Education</Description>
 		<Version>0.1.0</Version>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<LangVersion>latest</LangVersion>
@@ -31,7 +31,7 @@
 		and also allow the build to move the mod DLLs into the plugins directory for you
 	-->
 	<PropertyGroup>
-		<Cities2_Location>C:\Program Files (x86)\Steam\steamapps\common\Cities Skylines II</Cities2_Location>
+		<Cities2_Location>C:\Steam\steamapps\common\Cities Skylines II</Cities2_Location>
 	</PropertyGroup>
 
 	<!--

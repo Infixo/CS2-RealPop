@@ -7,9 +7,9 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Scripting;
 
-namespace MyCoolMod.Systems
+namespace RealPop.Systems
 {
-    public class MyCoolModSystem : GameSystemBase
+    public class RealPopSystem : GameSystemBase
     {
         // private SimulationSystem simulation;
 
@@ -23,7 +23,7 @@ namespace MyCoolMod.Systems
 
         private void CreateKeyBinding()
         {
-            var inputAction = new InputAction("MyModHotkeyPress");
+            var inputAction = new InputAction("RealPopHotkeyPress");
             inputAction.AddBinding("<Keyboard>/n");
             inputAction.performed += OnHotkeyPress;
             inputAction.Enable();
