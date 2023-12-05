@@ -264,7 +264,7 @@ public class GraduationSystem_RealPop : GameSystemBase
         {
             num3 -= num2 * (float)economyParameters.m_UnemploymentBenefit;
         }
-        float num4 = math.max(0f, (float)AgingSystem.GetElderAgeLimitInDays() - age);
+        float num4 = math.max(0f, (float)AgingSystem_RealPop.GetElderAgeLimitInDays() - age);
         float num5 = (float)economyParameters.GetWage(math.min(2, level - 1)) * num4;
         float num6 = math.lerp(economyParameters.GetWage(level), economyParameters.GetWage(level - 1), s) * (num4 - num2) - num3 + (0.5f + studyWillingness) * (float)economyParameters.m_UnemploymentBenefit * num2;
         if (num5 < num6)

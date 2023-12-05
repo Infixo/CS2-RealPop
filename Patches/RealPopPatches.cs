@@ -1,18 +1,7 @@
-//using System;
-//using System.Reflection.Emit;
-//using System.Collections.Generic;
-//using System.Linq;
-//using Unity.Mathematics;
-//using Colossal.UI;
 using Game;
-//using Game.Simulation;
-//using Game.SceneFlow;
-//using Game.Audio;
-//using Game.UI.Menu;
 using HarmonyLib;
 using RealPop.Systems;
 using UnityEngine;
-//using BepInEx;
 
 namespace RealPop.Patches;
 
@@ -27,20 +16,9 @@ class RealPopPatches
         //updateSystem.UpdateAt<ApplyToSchoolSystem_RealPop>(SystemUpdatePhase.GameSimulation);
         updateSystem.UpdateAt<GraduationSystem_RealPop>(SystemUpdatePhase.GameSimulation);
         updateSystem.UpdateAt<SchoolAISystem_RealPop>(SystemUpdatePhase.GameSimulation);
+        updateSystem.UpdateAt<CitizenInitializeSystem_RealPop>(SystemUpdatePhase.Modification5);
     }
 
-    // AGING SYSTEM REPLACEMENT
-    /*
-    [HarmonyPatch(typeof(Game.Simulation.AgingSystem), "OnCreate")]
-    [HarmonyPrefix]
-    static bool OnCreate(Game.Simulation.AgingSystem __instance)
-    {
-        UnityEngine.Debug.Log("AgingSystem.OnCreate_Prefix");
-        __instance.World.GetOrCreateSystemManaged<RealPop.Systems.AgingSystem_RealPop>();
-        __instance.World.GetOrCreateSystemManaged<Game.UpdateSystem>().UpdateAt<RealPop.Systems.AgingSystem_RealPop>(Game.SystemUpdatePhase.GameSimulation);
-        return true; // Allow the original method to run so that we only receive update requests when necessary
-    }
-    */
     [HarmonyPatch(typeof(Game.Simulation.AgingSystem), "OnUpdate")]
     [HarmonyPrefix]
     static bool AgingSystem_OnUpdate(Game.Simulation.AgingSystem __instance)
@@ -50,19 +28,6 @@ class RealPopPatches
         return false; // don't execute the original system
     }
 
-    // APPLY TO SCHOOL SYSTEM REPLACEMENT
-    /*
-
-    [HarmonyPatch(typeof(Game.Simulation.ApplyToSchoolSystem), "OnCreate")]
-    [HarmonyPrefix]
-    static bool OnCreate(Game.Simulation.ApplyToSchoolSystem __instance)
-    {
-        UnityEngine.Debug.Log("ApplyToSchoolSystem.OnCreate_Prefix");
-        __instance.World.GetOrCreateSystemManaged<RealPop.Systems.ApplyToSchoolSystem_RealPop>();
-        __instance.World.GetOrCreateSystemManaged<Game.UpdateSystem>().UpdateAt<RealPop.Systems.ApplyToSchoolSystem_RealPop>(Game.SystemUpdatePhase.GameSimulation);
-        return true; // allow the original method to run so we can later receive update requests
-    }
-    */
     /*
     [HarmonyPatch(typeof(Game.Simulation.ApplyToSchoolSystem), "OnUpdate")]
     [HarmonyPrefix]
@@ -74,18 +39,6 @@ class RealPopPatches
     }
     */
 
-    // GRADUATION SYSTEM REPLACEMENT
-    /*
-    [HarmonyPatch(typeof(Game.Simulation.GraduationSystem), "OnCreate")]
-    [HarmonyPrefix]
-    static bool OnCreate(Game.Simulation.GraduationSystem __instance)
-    {
-        UnityEngine.Debug.Log("GraduationSystem.OnCreate_Prefix");
-        __instance.World.GetOrCreateSystemManaged<RealPop.Systems.GraduationSystem_RealPop>();
-        __instance.World.GetOrCreateSystemManaged<Game.UpdateSystem>().UpdateAt<RealPop.Systems.GraduationSystem_RealPop>(Game.SystemUpdatePhase.GameSimulation);
-        return true; // Allow the original method to run so that we only receive update requests when necessary
-    }
-    */
     [HarmonyPatch(typeof(Game.Simulation.GraduationSystem), "OnUpdate")]
     [HarmonyPrefix]
     static bool GraduationSystem_OnUpdate(Game.Simulation.GraduationSystem __instance)
@@ -100,6 +53,15 @@ class RealPopPatches
     static bool SchoolAISystem_OnUpdate(Game.Simulation.SchoolAISystem __instance)
     {
         //RealPop.Debug.Log("Original SchoolAISystem disabled.");
+        //__instance.World.GetOrCreateSystemManaged<RealPop.Systems.AgingSystem_RealPop>().Update();
+        return false; // don't execute the original system
+    }
+
+    [HarmonyPatch(typeof(Game.Citizens.CitizenInitializeSystem), "OnUpdate")]
+    [HarmonyPrefix]
+    static bool CitizenInitializeSystem_OnUpdate()
+    {
+        //RealPop.Debug.Log("Original AgingSystem disabled.");
         //__instance.World.GetOrCreateSystemManaged<RealPop.Systems.AgingSystem_RealPop>().Update();
         return false; // don't execute the original system
     }
@@ -121,76 +83,31 @@ class RealPopPatches
     }
 #endif
 }
-
 /*
-
-[HarmonyPrefix, HarmonyPatch(typeof(Game.Simulation.AgingSystem), "GetTeenAgeLimitInDays")]
-static bool GetTeenAgeLimitInDays_Prefix(ref int __result)
-{
-    UnityEngine.Debug.Log("GetTeenAgeLimitInDays_Prefix");
-    __result = 10; // 21
-    return false; // don't execute the original method after this
-}
-
-[HarmonyPrefix, HarmonyPatch(typeof(Game.Simulation.AgingSystem), "GetAdultAgeLimitInDays")]
-static bool GetAdultAgeLimitInDays_Prefix(ref int __result)
-{
-    UnityEngine.Debug.Log("GetAdultAgeLimitInDays_Prefix");
-    __result = 36; // 36
-    return false; // don't execute the original method after this
-}
-
-[HarmonyPrefix, HarmonyPatch(typeof(Game.Simulation.AgingSystem), "GetElderAgeLimitInDays")]
-static bool GetElderAgeLimitInDays_Prefix(ref int __result)
-{
-    UnityEngine.Debug.Log("GetElderAgeLimitInDays_Prefix");
-    __result = 84; // 84
-    return false; // don't execute the original method after this
-}
-
-*/
-/*
-[HarmonyPrefix, HarmonyPatch(typeof(Game.Simulation.GraduationSystem), "GetGraduationProbability",
-    new Type[] { typeof(int), typeof(int), typeof(float), typeof(float2), typeof(float2), typeof(float), typeof(float) },
-    new ArgumentType[] { ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal })] // use ArgumentType.Ref for ref argument
-
-static bool GetGraduationProbability_Prefix(ref float __result, int level, int wellbeing, float graduationModifier, float2 collegeModifier, float2 uniModifier, float studyWillingness, float efficiency)
-{
-    if (efficiency <= 0.001f)
+    [HarmonyPrefix, HarmonyPatch(typeof(Game.Simulation.AgingSystem), "GetTeenAgeLimitInDays")]
+    static bool GetTeenAgeLimitInDays_Prefix(ref int __result)
     {
-        __result = 0f;
+        RealPop.Debug.Log("GetTeenAgeLimitInDays_Prefix");
+        __result = 12; // 21
         return false; // don't execute the original method after this
     }
-    float num = math.saturate((0.5f + studyWillingness) * (float)wellbeing / 75f);
-    float num2 = 0f;
-    switch (level)
+
+    [HarmonyPrefix, HarmonyPatch(typeof(Game.Simulation.AgingSystem), "GetAdultAgeLimitInDays")]
+    static bool GetAdultAgeLimitInDays_Prefix(ref int __result)
     {
-        case 1:
-            num2 = math.smoothstep(0f, 1f, 0.6f * num + 0.41f);
-            break;
-        case 2:
-            num2 = 0.6f * math.log(2.6f * num + 1.1f);
-            break;
-        case 3:
-            num2 = 90f * math.log(1.6f * num + 1f);
-            num2 += collegeModifier.x;
-            num2 += num2 * collegeModifier.y;
-            num2 /= 100f;
-            break;
-        case 4:
-            num2 = 70f * num;
-            num2 += uniModifier.x;
-            num2 += num2 * uniModifier.y;
-            num2 /= 100f;
-            break;
-        default:
-            num2 = 0f;
-            break;
+        RealPop.Debug.Log("GetAdultAgeLimitInDays_Prefix");
+        __result = 24; // 36
+        return false; // don't execute the original method after this
     }
-    num2 = 1f - (1f - num2) / efficiency;
-    __result = num2 + graduationModifier;
-    UnityEngine.Debug.Log($"{MyPluginInfo.PLUGIN_GUID} School {level} ({efficiency}) GradProb={__result} input: {wellbeing},{graduationModifier},{collegeModifier},{uniModifier},{studyWillingness}");
-    return false; // don't execute the original method after this
+
+    [HarmonyPrefix, HarmonyPatch(typeof(Game.Simulation.AgingSystem), "GetElderAgeLimitInDays")]
+    static bool GetElderAgeLimitInDays_Prefix(ref int __result)
+    {
+        RealPop.Debug.Log("GetElderAgeLimitInDays_Prefix");
+        __result = 77; // 84
+        return false; // don't execute the original method after this
+    }
+
 }
 */
 
