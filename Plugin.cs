@@ -30,14 +30,5 @@ public class Plugin : BaseUnityPlugin
         foreach (var patchedMethod in patchedMethods) {
             Logger.LogInfo($"Patched method: {patchedMethod.Module.Name}:{patchedMethod.Name}");
         }
-
-        // trying do disable stack dump
-        UnityEngine.Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
-    }
-
-    // Keep in mind, Unity UI is immediate mode, so OnGUI is called multiple times per frame
-    // https://docs.unity3d.com/ScriptReference/MonoBehaviour.OnGUI.html
-    private void OnGUI() {
-        GUI.Label(new Rect(10, 10, 300, 20), $"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
     }
 }

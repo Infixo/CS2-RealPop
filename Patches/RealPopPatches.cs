@@ -105,6 +105,7 @@ class RealPopPatches
     }
 
     // TURN OFF STACK TRACE IN LOGS
+#if DEBUG
     [HarmonyPatch(typeof(Game.SceneFlow.GameManager), "SetNativeStackTrace")]
     [HarmonyPrefix]
     static bool SetNativeStackTrace()
@@ -118,6 +119,7 @@ class RealPopPatches
         UnityEngine.Debug.Log(Game.SceneFlow.GameManager.GetSystemInfoString());
         return false; // don't execute the original
     }
+#endif
 }
 
 /*

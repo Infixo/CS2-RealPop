@@ -11,7 +11,7 @@
 		<TargetFramework>netstandard2.1</TargetFramework>
 		<AssemblyName>RealPopMod</AssemblyName>
 		<RootNamespace>RealPop</RootNamespace>
-		<Description>Realistic Population and Education</Description>
+		<Description>Rebalanced Population and Education</Description>
 		<Version>0.1.0</Version>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<LangVersion>latest</LangVersion>
@@ -39,9 +39,9 @@
 		above needs to be uncommented for this to work
 	-->
 	<ItemGroup>
-        <Reference Include="$(Cities2_Location)\Cities2_Data\Managed\Colossal.*.dll" Private="False"/>
-        <Reference Include="$(Cities2_Location)\Cities2_Data\Managed\Game.dll" Private="False"/>
-        <Reference Include="$(Cities2_Location)\Cities2_Data\Managed\Unity.*.dll" Private="False"/>
+        <Reference Include="$(Cities2_Location)\Cities2_Data\Managed\Colossal.*.dll" Private="False" />
+        <Reference Include="$(Cities2_Location)\Cities2_Data\Managed\Game.dll" Private="False" />
+        <Reference Include="$(Cities2_Location)\Cities2_Data\Managed\Unity.*.dll" Private="False" />
 	</ItemGroup>
 
 	<!--
@@ -57,9 +57,17 @@
 		DO NOT make the proprietary DLLs for the game public, as the files are owned by PDX/CO. 
 	-->
 	<ItemGroup>
-		<Reference Include="libcs2/Colossal.*.dll" Private="False"/>
-		<Reference Include="libcs2/Game.dll" Private="False"/>
-		<Reference Include="libcs2/Unity.*.dll" Private="False"/>
+		<Reference Include="libcs2/Colossal.*.dll" Private="False" />
+		<Reference Include="libcs2/Game.dll" Private="False" />
+		<Reference Include="libcs2/Unity.*.dll" Private="False" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Compile Remove="Systems\ApplyToSchoolSystem.cs" />
+	  <Compile Remove="Systems\RealPopSystem.cs" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Include="Systems\ApplyToSchoolSystem.cs" />
+	  <None Include="Systems\RealPopSystem.cs" />
 	</ItemGroup>
 
 	<!--
@@ -86,7 +94,7 @@
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(BepInExVersion)' == '5'">
-		<PackageReference Include="BepInEx.Core" Version="5.4.21" IncludeAssets="compile"/>
+		<PackageReference Include="BepInEx.Core" Version="5.4.21" IncludeAssets="compile" />
 	</ItemGroup>
 
 	<PropertyGroup Condition="'$(BepInExVersion)' == '6'">
@@ -94,8 +102,7 @@
 	</PropertyGroup>
 
 	<ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
-		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2"
-			PrivateAssets="all" />
+		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
 	</ItemGroup>
 
 	<!--
@@ -103,7 +110,6 @@
 		as long as we're not in CI
 	-->
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(CI)' != 'true'">
-		<Exec
-			Command="if not exist &quot;$(Cities2_Location)\BepInEx\plugins\$(ProjectName)&quot; mkdir &quot;$(Cities2_Location)\BepInEx\plugins\$(ProjectName)&quot;&#xD;&#xA;copy /Y &quot;$(TargetDir)0Harmony.dll&quot; &quot;$(Cities2_Location)\BepInEx\plugins\$(ProjectName)\0Harmony.dll&quot;&#xD;&#xA;copy /Y &quot;$(TargetDir)$(ProjectName).dll&quot; &quot;$(Cities2_Location)\BepInEx\plugins\$(ProjectName)\$(ProjectName).dll&quot;" />
+		<Exec Command="if not exist &quot;$(Cities2_Location)\BepInEx\plugins\$(ProjectName)&quot; mkdir &quot;$(Cities2_Location)\BepInEx\plugins\$(ProjectName)&quot;&#xD;&#xA;copy /Y &quot;$(TargetDir)0Harmony.dll&quot; &quot;$(Cities2_Location)\BepInEx\plugins\$(ProjectName)\0Harmony.dll&quot;&#xD;&#xA;copy /Y &quot;$(TargetDir)$(ProjectName).dll&quot; &quot;$(Cities2_Location)\BepInEx\plugins\$(ProjectName)\$(ProjectName).dll&quot;" />
 	</Target>
 </Project>
