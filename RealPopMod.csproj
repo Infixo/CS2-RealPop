@@ -62,11 +62,9 @@
 		<Reference Include="libcs2/Unity.*.dll" Private="False" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Compile Remove="Systems\ApplyToSchoolSystem.cs" />
 	  <Compile Remove="Systems\RealPopSystem.cs" />
 	</ItemGroup>
 	<ItemGroup>
-	  <None Include="Systems\ApplyToSchoolSystem.cs" />
 	  <None Include="Systems\RealPopSystem.cs" />
 	</ItemGroup>
 

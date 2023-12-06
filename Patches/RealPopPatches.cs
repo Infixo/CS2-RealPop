@@ -13,7 +13,7 @@ class RealPopPatches
     public static void Initialize_Postfix(UpdateSystem updateSystem)
     {
         updateSystem.UpdateAt<AgingSystem_RealPop>(SystemUpdatePhase.GameSimulation);
-        //updateSystem.UpdateAt<ApplyToSchoolSystem_RealPop>(SystemUpdatePhase.GameSimulation);
+        updateSystem.UpdateAt<ApplyToSchoolSystem_RealPop>(SystemUpdatePhase.GameSimulation);
         updateSystem.UpdateAt<GraduationSystem_RealPop>(SystemUpdatePhase.GameSimulation);
         updateSystem.UpdateAt<SchoolAISystem_RealPop>(SystemUpdatePhase.GameSimulation);
         updateSystem.UpdateAt<CitizenInitializeSystem_RealPop>(SystemUpdatePhase.Modification5);
@@ -28,7 +28,6 @@ class RealPopPatches
         return false; // don't execute the original system
     }
 
-    /*
     [HarmonyPatch(typeof(Game.Simulation.ApplyToSchoolSystem), "OnUpdate")]
     [HarmonyPrefix]
     static bool ApplyToSchoolSystem_OnUpdate(Game.Simulation.ApplyToSchoolSystem __instance)
@@ -36,8 +35,7 @@ class RealPopPatches
         //RealPop.Debug.Log("original system disabled");
         //__instance.World.GetOrCreateSystemManaged<RealPop.Systems.ApplyToSchoolSystem_RealPop>().Update();
         return false; // don't execute the original system
-    }
-    */
+    }    
 
     [HarmonyPatch(typeof(Game.Simulation.GraduationSystem), "OnUpdate")]
     [HarmonyPrefix]

@@ -88,6 +88,7 @@ public class ApplyToSchoolSystem_RealPop : GameSystemBase
             NativeArray<Worker> nativeArray3 = chunk.GetNativeArray(ref m_WorkerType);
             DynamicBuffer<CityModifier> dynamicBuffer = m_CityModifiers[m_City];
             Random random = m_RandomSeed.GetRandom(unfilteredChunkIndex);
+            //int day = TimeSystem.GetDay(m_SimulationFrame, m_TimeData);
             for (int i = 0; i < chunk.Count; i++)
             {
                 Citizen citizen = nativeArray2[i];
@@ -96,18 +97,26 @@ public class ApplyToSchoolSystem_RealPop : GameSystemBase
                 {
                     continue;
                 }
+                //int ageInDays = day - citizen.m_BirthDay;
                 int num = random.NextInt(100);
                 int num2 = random.NextInt(100);
                 int num3 = ((age == CitizenAge.Child) ? 1 : (citizen.GetEducationLevel() + 1));
                 int failedEducationCount = citizen.GetFailedEducationCount();
-                if (failedEducationCount == 0 && num3 == 3)
-                {
-                    num3 = 4;
-                }
-                bool num4 = age == CitizenAge.Child || (age == CitizenAge.Teen && num3 >= 2) || (age == CitizenAge.Adult && num3 >= 3);
+                // Infixo: removes College skipping and going directly to University; idk if this is a bug or intended
+                // Dev Diaries say nothing about such situation however this code didn't write itself
+                // hard to say what was the intention here
+                //if (failedEducationCount == 0 && num3 == 3)
+                //{
+                    //num3 = 4;
+                //}
+                // Infixo: removes Teens going to University, Dev Diaries say that only Adults are allowed to go to University
+                //bool num4 = age == CitizenAge.Child || (age == CitizenAge.Teen && num3 >= 2) || (age == CitizenAge.Adult && num3 >= 3);
+                bool num4 = age == CitizenAge.Child || (age == CitizenAge.Teen && num3 >= 2 && num3 < 4) || (age == CitizenAge.Adult && num3 >= 3);
                 Entity household = m_HouseholdMembers[nativeArray[i]].m_Household;
+                //string logmsg = $"{age} {ageInDays} edu {num3} failed {failedEducationCount}";
                 if (!num4 || !m_HouseholdDatas.HasComponent(household) || (m_HouseholdDatas[household].m_Flags & HouseholdFlags.MovedIn) == 0 || failedEducationCount >= 3 || num3 < 1 || num3 > 4)
                 {
+                    //Plugin.Logger.LogInfo(logmsg + $" NOENTRY flags {m_HouseholdDatas[household].m_Flags} ");
                     continue;
                 }
                 int householdWorth = EconomyUtils.GetHouseholdWorth(household, m_HouseholdDatas[household], m_Resources[household]);
@@ -120,6 +129,7 @@ public class ApplyToSchoolSystem_RealPop : GameSystemBase
                 //RealPop.Debug.Log($"ApplyToSchool: prob {enteringProbability} lev {num3} age {age} work {nativeArray3.IsCreated} well {citizen.m_WellBeing} will {willingness}");
                 if ((float)num2 > 100f * dropoutProbability && (float)num < 100f * enteringProbability)
                 {
+                    //Plugin.Logger.LogInfo(logmsg + $" APPLIED prob {enteringProbability}");
                     if (m_PropertyRenters.HasComponent(household) && !m_TouristHouseholds.HasComponent(household))
                     {
                         Entity property = m_PropertyRenters[household].m_Property;
@@ -144,6 +154,7 @@ public class ApplyToSchoolSystem_RealPop : GameSystemBase
                 }
                 else
                 {
+                    //Plugin.Logger.LogInfo(logmsg + $" DENIED prob {enteringProbability}");
                     citizen.SetFailedEducationCount(math.min(3, failedEducationCount + 1));
                     nativeArray2[i] = citizen;
                 }
@@ -238,7 +249,6 @@ public class ApplyToSchoolSystem_RealPop : GameSystemBase
     [Preserve]
     protected override void OnCreate()
     {
-        RealPop.Debug.Log("Modded ApplyToSchool system created.");
         base.OnCreate();
         m_SimulationSystem = base.World.GetOrCreateSystemManaged<SimulationSystem>();
         m_EndFrameBarrier = base.World.GetOrCreateSystemManaged<EndFrameBarrier>();
@@ -262,6 +272,7 @@ public class ApplyToSchoolSystem_RealPop : GameSystemBase
         RequireForUpdate(m_CitizenGroup);
         RequireForUpdate<EconomyParameterData>();
         RequireForUpdate<TimeData>();
+        Plugin.Logger.LogInfo("Modded ApplyToSchoolSystem created.");
     }
 
     [Preserve]
