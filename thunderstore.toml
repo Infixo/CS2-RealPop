@@ -2,16 +2,15 @@
 schemaVersion = "0.0.1"
 
 [package]
-namespace = "CaptainOfCoit"
-name = "MyCoolMod"
-versionNumber = "0.1.0"
-description = "Example mod description"
+namespace = "Infixo"
+name = "Population_Rebalance"
+versionNumber = "0.2.0"
+description = "Tweaks cims' lifecycle for more balanced population and education needs."
 websiteUrl = "https://thunderstore.io"
 containsNsfwContent = false
 
 [package.dependencies]
 # BepInEx-BepInExPack = "5.4.2100"
-# CaptainOfCoit-HookUI = "0.3.0"
 
 [build]
 icon = "./icon.png"

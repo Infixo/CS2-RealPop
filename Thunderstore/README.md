@@ -37,6 +37,10 @@ The goal of this mod is to rebalance population structure and education needs, t
 - Fix graduation logic, making sure that students will stay more than 1-2 day in schools.
 - Correct Average Time Spent in school calculations.
 
+## Support
+- Please report bugs and issue on [GitHub] (https://github.com/Infixo/CS2-RealPop).
+- You may also leave comments on [Discord]( https://discord.com/channels/1169011184557637825/1181630312338444398).
+
 ## Disclaimers and Notes
 > [!IMPORTANT]
 It will take one full in-game day for the population to adjust to the new thresholds. Education changes need more time, at least 3-5 days. You may wanna build a few extra High Schools until the levels will adjust.

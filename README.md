@@ -1,90 +1,59 @@
-# Cities: Skylines 2 - C# Mod template
+# Cities Skylines 2 : Population and Education Rebalance Mod
+The goal of this mod is to rebalance population structure and education needs, to be more realistic. It will reduce the number of Children and increase the number or Teens, thus balancing the needs for Elementary and High Schools.
 
-This repository template allows you to get started with Cities: Skylines 2 modding easily, all the way to building your mod on commit with GitHub Actions and publishing your mod automatically on Thunderstore.
+## Features
 
-- [Requirements](#requirements)
-- [Usage](#usage)
-- [Renaming your project](#renaming-your-project)
-- [Set license details](#set-license-details)
-- [Incrementing version number](#incrementing-version-number)
-- [CI / GitHub Actions - Setup](#ci-github-actions-setup)
-- [Regarding BepInEx version 5 (Stable) VS 6 (Alpha/Unstable/Nightly)](#regarding-bepinex-version-5-stable-vs-6-alphaunstablenightly)
-- [Credits](#credits)
-- [Community](#community)
+### Lifecycle adjustments
+  - Default thresholds for licycle stages are changed from 21/36/84 to 12/24/77. As a result, population structure should be more realistic i.e. 15% Children, 10% Teens, 60% Adults and 15% Seniors. These are approximate numbers ofc, may differ in your cities.
+  - The thresholds can be individually set in the config file.
+### Graduation probability
+  - Graduation probability is tweaked so the average time spent in schools is more aligned to the cim's lifcycle. For fully staffed and efficient schools, it will be ~9 years for Elementary School, ~6 years for High School, ~6 years for College and ~9 years for University. The numbers will vary, depending on how well your city is developed.
+  - The graduation params can be individually set in the config file.
+### Education needs
+  - As a result of the above changes, you should need less Elementary Schools, approx. 1 per 10000 citizens and a bit more High Schools, approx. 1 per 30000. College and University needs are not changed much, 1 College per 35000 and 1 University per 50-60 thousands cims.
 
-# Requirements
+## Requirements and Compatibility
+- Cities Skylines II version 1.0.15f1
+- BepInEx 5
 
-- [Cities: Skylines 2](https://store.steampowered.com/app/949230/Cities_Skylines_II/) (duh)
-- [BepInEx 5.4.22](https://github.com/BepInEx/BepInEx/releases) or later
-- (Optional) [dotnet-script](https://github.com/dotnet-script/dotnet-script) (for `rename.csx` helper script)
-    - Installation `dotnet tool install -g dotnet-script`
+## Installation
+1. Place the `RealPopMod.dll` file in your BepInEx `Plugins` folder.
+2. The config file is automatically created when the game is run once.
 
-# Usage
+## Known Issues
+- Nothing atm.
 
-- Create a new repository based on this one
-- Clone your new repository to your computer
-- Uncomment and update the `Cities2_Location` variable in `MyCoolMod.csproj`
-- Run `make build`
+## Changelog
+- v0.2.0 (2023-12-06)
+  - Added config file in BepInEx/config folder.
+  - Newly created citizens also follow the updated lifecycle thresholds.
+- v0.1.1 (2023-12-05)
+  - Changed icon to be more readable on Thunderstore.
+- v0.1.0 (2023-12-05)
+  - Initial build.
 
-After running the last command, the mod should be automatically copied to your game directory,
-so launching the game should include running the mod you just started :)
+## Planned Features
+- Waiting to see what CO will do about this topic.
+- Fix graduation logic, making sure that students will stay more than 1-2 day in schools.
+- Correct Average Time Spent in school calculations.
 
-# Renaming your project
+## Support
+- Please report bugs and issue on [GitHub] (https://github.com/Infixo/CS2-RealPop).
+- You may also leave comments on [Discord]( https://discord.com/channels/1169011184557637825/1181630312338444398).
 
-You can leverage the helper script in `scripts/rename.csx` in order to replace "MyCoolMod" with whatever you want to name your project. Usage:
+## Disclaimers and Notes
+> [!IMPORTANT]
+It will take one full in-game day for the population to adjust to the new thresholds. Education changes need more time, at least 3-5 days. You may wanna build a few extra High Schools until the levels will adjust.
 
-```
-$ dotnet script scripts\rename.csx "MyCoolMod" "AnotherModIMade"
-```
+> [!IMPORTANT]
+Cims cannot go back to the previous phase of their lives, so changes done by this mod are irreversible. Make sure to have a savefile. Once the mod is deactivated, cims will follow default logic, so eventually the city will return to the vanilla state, but it will take several in-game days.
 
-# Set license details
+> [!NOTE]
+> The graduation logic implemented in the game is flawed, imho. Most students stay in schools for 1-2 days usually. The average time shown in the UI is totally incorrect (on many levels, both calculations and UI presentation).
 
-You'll need to update `LICENSE` with the correct details for `<Year>` and `<Author>`, and change "MyCoolMod" to your mod name if you haven't already.
+> [!CAUTION]
+> You are downloading, installing, and running this mod on your computer at your own risk.  I do not accept any responsibility for damage caused to your game, your computer, or your Cim's lives.
 
-# Incrementing version number
-
-- Update `.csproj` file with new version number
-- Update `thunderstore.toml` file with new version number
-- Update `CHANGELOG` to describe the changes you've made between this and previous version
-- Commit version bump
-- Do a git tag with the new version number
-    - `git tag -a v0.2.0 -m v0.2.0`
-- Push your changes + tags
-    - `git push origin master --tags`
-
-# CI / GitHub Actions - Setup
-
-In order to get the CI/GitHub Actions workflow to work, you have to do a couple of things.
-
-- Create a new private repository with all the game DLLs that you require for building your mod
-- Create a new GitHub Personal Access Token ("PAT") that has only READ access to the created private repository
-- Create a new secret variable in GitHub Actions called `GH_PAT` that has your PAT with read access to the private repository
-
-Now the CI job should work as expected :)
-
-# Regarding BepInEx version 5 (Stable) VS 6 (Alpha/Unstable/Nightly)
-
-Currently, this mod template defaults to building against BepInEx version 6 (unstable pre-release). If you'd like to instead use Stable BepInEx version 5, you can run the build like this:
-
-```
-$ make build BEPINEX_VERSION=5
-```
-
-In order to run code only for one BepInEx version, you can do something like this:
-
-```
-#if BEPINEX_V6
-    using BepInEx.Unity.Mono;
-#endif
-```
-
-That would only run `using BepInEx.Unity.Mono` when you're building the project for BepInEx 6. Add in a `else` if you want to do something different when it's version 5.
-
-# Credits
-
-- Thanks to Cities Skylines 2 Unofficial Modding Discord
-- Particular thanks to [@StudioLE](https://github.com/StudioLE) who helped with feedback and improving .csproj setup
-
-# Community
-
-Looking to discuss Cities: Skylines 2 Unofficial modding together with other modders? You're welcome to join our "Cities 2 Modding" Discord, which you can find here: https://discord.gg/vd7HXnpPJf
+> [!NOTE]
+> The timeline in CS2 is measured in days. Each in-game day also represents 1 month (e.g. when looking at average time spent in schools) but also can be treated as 1 year of cim life, which is much more reasonable than using months. Cims live around 100 days, give or take few, so it is pretty close to average fuman lifespan (80+ years).
+> The population structure is based on EU statistics data, population by age. 0-14 years is ~15%, which we can consider Children in CS2 reality. 15-24 years is 11%, which we can consider Teens. And 65+ years is 21%, which we can consider Seniors (65 is usual retirement age in EU). The rest are Adults.
