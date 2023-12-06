@@ -123,7 +123,7 @@ public class GraduationSystem_RealPop : GameSystemBase
                 float efficiency = BuildingUtils.GetEfficiency(school, ref m_BuildingEfficiencies);
                 float graduationProbability = GetGraduationProbability(num, wellBeing, result, modifiers, studyWillingness, efficiency);
                 int ageInDays = day - reference.m_BirthDay;
-                string logmsg = $"{reference.GetAge()} {entity.Index} {ageInDays} school {num} failed {reference.GetFailedEducationCount()} grad_prob {graduationProbability}";
+                //string logmsg = $"{reference.GetAge()} {entity.Index} {ageInDays} school {num} failed {reference.GetFailedEducationCount()} grad_prob {graduationProbability}";
                 //RealPop.Debug.Log($"grad_prob {graduationProbability} lev {num} well {wellBeing} mod {result.m_GraduationModifier} will {studyWillingness} eff {efficiency}");
                 //Plugin.Logger.LogInfo($"{reference.GetAge()} {entity.Index} age {ageInDays} school {num} failed {reference.GetFailedEducationCount()} prob {graduationProbability}");
                 // Infixo: first check if graduation is possible

@@ -1,4 +1,4 @@
-# Cities Skylines 2 : Population and Education Rebalance Mod
+# Population and Education Rebalance Mod
 The goal of this mod is to rebalance population structure and education needs, to be more realistic. It will reduce the number of Children and increase the number or Teens, thus balancing the needs for Elementary and High Schools.
 
 ## Features
@@ -6,24 +6,37 @@ The goal of this mod is to rebalance population structure and education needs, t
 ### Lifecycle adjustments
   - Default thresholds for licycle stages are changed from 21/36/84 to 12/24/77. As a result, population structure should be more realistic i.e. 15% Children, 10% Teens, 60% Adults and 15% Seniors. These are approximate numbers ofc, may differ in your cities.
   - The thresholds can be individually set in the config file.
-### Graduation probability
-  - Graduation probability is tweaked so the average time spent in schools is more aligned to the cim's lifcycle. For fully staffed and efficient schools, it will be ~9 years for Elementary School, ~6 years for High School, ~6 years for College and ~9 years for University. The numbers will vary, depending on how well your city is developed.
+### Graduation logic
+  - Graduation process is more restrictive. Cims following typical education path will spend more time in High School, College and University. In Vanilla game they usually graduated after 1-2 days, rarely more. With this mod, they will spend a minimum number of days which is defined in the config file.
+  - Graduation probability is configurable.
   - The graduation params can be individually set in the config file.
 ### Education needs
   - As a result of the above changes, you should need less Elementary Schools, approx. 1 per 10000 citizens and a bit more High Schools, approx. 1 per 30000. College and University needs are not changed much, 1 College per 35000 and 1 University per 50-60 thousands cims.
+  - Also, cims will stay longer in schools. Please note that "Average time to graduate" will now show the correct value in years, however year here is the same as day or month. So, don't be alarmed e.g. when you see 4 years. It means that cims on average will spend 4 in-game days or months in this school.
+### Fixes for ApplyToSchool logic
+  - Teens will no longer go to University.
+  - College cannot be skipped. Vanilla game allows for direct jump from High School to University, even for Teens (famous genius Teens).
+### Planned Features
+- Waiting to see what CO will do about this topic.
 
-## Requirements and Compatibility
+## Technical
+
+### Requirements and Compatibility
 - Cities Skylines II version 1.0.15f1
 - BepInEx 5
+- Cim Behavior Improvements mod is not compatible (both modify ApplyToSchoolSystem).
 
-## Installation
+### Installation
 1. Place the `RealPopMod.dll` file in your BepInEx `Plugins` folder.
 2. The config file is automatically created when the game is run once.
 
-## Known Issues
+### Known Issues
 - Nothing atm.
 
-## Changelog
+### Changelog
+- v0.3.0 (2023-12-07)
+  - Graduation logic revamped.
+  - 2 fixes for ApplyToSchool system.
 - v0.2.0 (2023-12-06)
   - Added config file in BepInEx/config folder.
   - Newly created citizens also follow the updated lifecycle thresholds.
@@ -32,14 +45,9 @@ The goal of this mod is to rebalance population structure and education needs, t
 - v0.1.0 (2023-12-05)
   - Initial build.
 
-## Planned Features
-- Waiting to see what CO will do about this topic.
-- Fix graduation logic, making sure that students will stay more than 1-2 day in schools.
-- Correct Average Time Spent in school calculations.
-
-## Support
-- Please report bugs and issue on [GitHub] (https://github.com/Infixo/CS2-RealPop).
-- You may also leave comments on [Discord]( https://discord.com/channels/1169011184557637825/1181630312338444398).
+### Support
+- Please report bugs and issues on [GitHub](https://github.com/Infixo/CS2-RealPop).
+- You may also leave comments on [Discord](https://discord.com/channels/1169011184557637825/1181630312338444398).
 
 ## Disclaimers and Notes
 > [!IMPORTANT]
@@ -50,9 +58,6 @@ Cims cannot go back to the previous phase of their lives, so changes done by thi
 
 > [!NOTE]
 > The graduation logic implemented in the game is flawed, imho. Most students stay in schools for 1-2 days usually. The average time shown in the UI is totally incorrect (on many levels, both calculations and UI presentation).
-
-> [!CAUTION]
-> You are downloading, installing, and running this mod on your computer at your own risk.  I do not accept any responsibility for damage caused to your game, your computer, or your Cim's lives.
 
 > [!NOTE]
 > The timeline in CS2 is measured in days. Each in-game day also represents 1 month (e.g. when looking at average time spent in schools) but also can be treated as 1 year of cim life, which is much more reasonable than using months. Cims live around 100 days, give or take few, so it is pretty close to average fuman lifespan (80+ years).
