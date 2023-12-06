@@ -1,7 +1,7 @@
 {
     "name": "Population_Rebalance",
     "description": "Tweaks cims' lifecycle for more balanced population and education needs.",
-    "version_number": "0.1.1",
+    "version_number": "0.2.0",
     "dependencies": [
         "BepInEx-BepInExPack-5.4.2100"
     ],

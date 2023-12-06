@@ -17,6 +17,7 @@ using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine.Scripting;
+using BepInEx.Configuration;
 
 namespace RealPop.Systems;
 
@@ -316,6 +317,10 @@ public class AgingSystem_RealPop : GameSystemBase
 
     private TypeHandle __TypeHandle;
 
+    private static int s_TeenAgeLimitInDays;
+    private static int s_AdultAgeLimitInDays;
+    private static int s_ElderAgeLimitInDays;
+
     public override int GetUpdateInterval(SystemUpdatePhase phase)
     {
         return 262144 / (kUpdatesPerDay * 16);
@@ -324,7 +329,6 @@ public class AgingSystem_RealPop : GameSystemBase
     [Preserve]
     protected override void OnCreate()
     {
-        RealPop.Debug.Log("Modded AgingSystem created.");
         base.OnCreate();
         m_SimulationSystem = base.World.GetOrCreateSystemManaged<SimulationSystem>();
         m_EndFrameBarrier = base.World.GetOrCreateSystemManaged<EndFrameBarrier>();
@@ -347,6 +351,12 @@ public class AgingSystem_RealPop : GameSystemBase
         m_BecomeAdultCounter = new NativeCounter(Allocator.Persistent);
         m_BecomeElderCounter = new NativeCounter(Allocator.Persistent);
         RequireForUpdate(m_CitizenGroup);
+        // Infixo
+        s_TeenAgeLimitInDays = Plugin.TeenAgeLimitInDays.Value;
+        s_AdultAgeLimitInDays = Plugin.AdultAgeLimitInDays.Value;
+        s_ElderAgeLimitInDays = Plugin.ElderAgeLimitInDays.Value;
+        //RealPop.Debug.Log("Modded AgingSystem created.");
+        Plugin.Logger.LogInfo($"Modded AgingSystem created. Age thresholds: {s_TeenAgeLimitInDays}, {s_AdultAgeLimitInDays}, {s_ElderAgeLimitInDays}.");
     }
 
     [Preserve]
@@ -364,17 +374,17 @@ public class AgingSystem_RealPop : GameSystemBase
 
     public static int GetTeenAgeLimitInDays()
     {
-        return 12; // default 21
+        return s_TeenAgeLimitInDays; // default 21
     }
 
     public static int GetAdultAgeLimitInDays()
     {
-        return 24; // default 36
+        return s_AdultAgeLimitInDays; // default 36
     }
 
     public static int GetElderAgeLimitInDays()
     {
-        return 77; // default 84
+        return s_ElderAgeLimitInDays; // default 84
     }
 
     [Preserve]

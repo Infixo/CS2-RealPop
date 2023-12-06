@@ -15,6 +15,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Scripting;
+using BepInEx.Configuration;
 
 namespace RealPop.Systems;
 
@@ -78,6 +79,7 @@ public class GraduationSystem_RealPop : GameSystemBase
             {
                 return;
             }
+            //Plugin.Logger.LogInfo($"GraduationJob.Execute: frame {m_UpdateFrameIndex}");
             NativeArray<Game.Citizens.Student> nativeArray = chunk.GetNativeArray(ref m_StudentType);
             NativeArray<Citizen> nativeArray2 = chunk.GetNativeArray(ref m_CitizenType);
             NativeArray<Entity> nativeArray3 = chunk.GetNativeArray(m_EntityType);
@@ -118,8 +120,10 @@ public class GraduationSystem_RealPop : GameSystemBase
                 float efficiency = BuildingUtils.GetEfficiency(school, ref m_BuildingEfficiencies);
                 float graduationProbability = GetGraduationProbability(num, wellBeing, result, modifiers, studyWillingness, efficiency);
                 //RealPop.Debug.Log($"grad_prob {graduationProbability} lev {num} well {wellBeing} mod {result.m_GraduationModifier} will {studyWillingness} eff {efficiency}");
+                //if (num==2) Plugin.Logger.LogInfo($"Entity {entity.Index} lev {num} prob {graduationProbability} failed {reference.GetFailedEducationCount()}");
                 if (random.NextFloat() < graduationProbability)
                 {
+                    //if (num==2) Plugin.Logger.LogInfo($"Entity {entity.Index} graduated to level {num}");
                     reference.SetEducationLevel(Mathf.Max(reference.GetEducationLevel(), num));
                     if (num > 1)
                     {
@@ -130,9 +134,11 @@ public class GraduationSystem_RealPop : GameSystemBase
                 }
                 if (num > 1)
                 {
+                    //if (num==2) Plugin.Logger.LogInfo($"Entity {entity.Index} FAILED");
                     int failedEducationCount = reference.GetFailedEducationCount();
                     if (failedEducationCount >= 3)
                     {
+                        //if (num==2) Plugin.Logger.LogInfo($"Entity {entity.Index} REMOVED");
                         LeaveSchool(unfilteredChunkIndex, entity, school);
                         m_TriggerBuffer.Enqueue(new TriggerAction(TriggerType.CitizenFailedSchool, Entity.Null, entity, school));
                         continue;
@@ -240,6 +246,11 @@ public class GraduationSystem_RealPop : GameSystemBase
 
     private EntityQuery __query_1855827631_1;
 
+    private static float s_GraduationLevel1; // elementary school
+    private static float s_GraduationLevel2; // high school
+    private static float s_GraduationLevel3; // college
+    private static float s_GraduationLevel4; // university
+
     public override int GetUpdateInterval(SystemUpdatePhase phase)
     {
         return 16384;
@@ -294,19 +305,21 @@ public class GraduationSystem_RealPop : GameSystemBase
         {
         case 1:
             num2 = math.smoothstep(0f, 1f, 0.6f * num + 0.41f);
-            num2 *= 0.9f; // modded
+            num2 *= s_GraduationLevel1; // default 100f
+            num2 /= 100f;
             break;
         case 2:
-            num2 = 0.75f * math.log(2.6f * num + 1.1f); // default 0.6f
+            num2 = s_GraduationLevel2 * math.log(2.6f * num + 1.1f); // default 60f
+            num2 /= 100f;
             break;
         case 3:
-            num2 = 90f * math.log(1.6f * num + 1f);
+            num2 = s_GraduationLevel3 * math.log(1.6f * num + 1f); // default 90f
             num2 += collegeModifier.x;
             num2 += num2 * collegeModifier.y;
             num2 /= 100f;
             break;
         case 4:
-            num2 = 80f * num; // default 70f
+            num2 = s_GraduationLevel4 * num; // default 70f
             num2 += uniModifier.x;
             num2 += num2 * uniModifier.y;
             num2 /= 100f;
@@ -322,7 +335,6 @@ public class GraduationSystem_RealPop : GameSystemBase
     [Preserve]
     protected override void OnCreate()
     {
-        RealPop.Debug.Log("Modded GraduationSystem created.");
         base.OnCreate();
         m_SimulationSystem = base.World.GetOrCreateSystemManaged<SimulationSystem>();
         m_EndFrameBarrier = base.World.GetOrCreateSystemManaged<EndFrameBarrier>();
@@ -332,6 +344,12 @@ public class GraduationSystem_RealPop : GameSystemBase
         RequireForUpdate(m_StudentQuery);
         RequireForUpdate<EconomyParameterData>();
         RequireForUpdate<TimeData>();
+        // Infixo
+        s_GraduationLevel1 = Plugin.GraduationLevel1.Value;
+        s_GraduationLevel2 = Plugin.GraduationLevel2.Value;
+        s_GraduationLevel3 = Plugin.GraduationLevel3.Value;
+        s_GraduationLevel4 = Plugin.GraduationLevel4.Value;
+        Plugin.Logger.LogInfo($"Modded GraduationSystem created. Graduation params: {s_GraduationLevel1}, {s_GraduationLevel2}, {s_GraduationLevel3}, {s_GraduationLevel4}");
     }
 
     [Preserve]

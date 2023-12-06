@@ -235,7 +235,6 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
     [Preserve]
     protected override void OnCreate()
     {
-        RealPop.Debug.Log("Modded CitizenInitializeSystem created.");
         base.OnCreate();
         m_SimulationSystem = base.World.GetOrCreateSystemManaged<SimulationSystem>();
         m_TriggerSystem = base.World.GetOrCreateSystemManaged<TriggerSystem>();
@@ -247,6 +246,7 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
         RequireForUpdate(m_Additions);
         RequireForUpdate(m_TimeDataQuery);
         RequireForUpdate(m_TimeSettingGroup);
+        Plugin.Logger.LogInfo("Modded CitizenInitializeSystem created.");
     }
 
     [Preserve]

@@ -245,7 +245,6 @@ public class SchoolAISystem_RealPop : GameSystemBase
     [Preserve]
     protected override void OnCreate()
     {
-        RealPop.Debug.Log("Modded SchoolAISystem created.");
         base.OnCreate();
         m_SimulationSystem = base.World.GetOrCreateSystemManaged<SimulationSystem>();
         m_CitySystem = base.World.GetOrCreateSystemManaged<CitySystem>();
@@ -255,6 +254,7 @@ public class SchoolAISystem_RealPop : GameSystemBase
         RequireForUpdate<EconomyParameterData>();
         RequireForUpdate<EducationParameterData>();
         RequireForUpdate<TimeData>();
+        Plugin.Logger.LogInfo("Modded SchoolAISystem created.");
     }
 
     [Preserve]
