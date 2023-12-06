@@ -86,12 +86,15 @@ public class GraduationSystem_RealPop : GameSystemBase
             DynamicBuffer<CityModifier> modifiers = m_CityModifiers[m_City];
             Unity.Mathematics.Random random = m_RandomSeed.GetRandom(unfilteredChunkIndex);
             //RealPop.Debug.Log($"graduation loop for {chunk.Count} people");
+            int day = TimeSystem.GetDay(m_SimulationFrame, m_TimeData);
+            //float ageInDays = citizen.GetAgeInDays(simulationFrame, timeData);
             for (int i = 0; i < chunk.Count; i++)
             {
-                if (random.NextInt(2) != 0)
-                {
-                    continue;
-                }
+                // Infixo: pseudo-random approach to graduate every other day :(
+                //if (random.NextInt(2) != 0)
+                //{
+                    //continue;
+                //}
                 Entity entity = nativeArray3[i];
                 Game.Citizens.Student student = nativeArray[i];
                 ref Citizen reference = ref nativeArray2.ElementAt(i);
@@ -119,11 +122,45 @@ public class GraduationSystem_RealPop : GameSystemBase
                 float studyWillingness = reference.GetPseudoRandom(CitizenPseudoRandom.StudyWillingness).NextFloat();
                 float efficiency = BuildingUtils.GetEfficiency(school, ref m_BuildingEfficiencies);
                 float graduationProbability = GetGraduationProbability(num, wellBeing, result, modifiers, studyWillingness, efficiency);
+                int ageInDays = day - reference.m_BirthDay;
+                string logmsg = $"{reference.GetAge()} {entity.Index} {ageInDays} school {num} failed {reference.GetFailedEducationCount()} grad_prob {graduationProbability}";
                 //RealPop.Debug.Log($"grad_prob {graduationProbability} lev {num} well {wellBeing} mod {result.m_GraduationModifier} will {studyWillingness} eff {efficiency}");
-                //if (num==2) Plugin.Logger.LogInfo($"Entity {entity.Index} lev {num} prob {graduationProbability} failed {reference.GetFailedEducationCount()}");
+                //Plugin.Logger.LogInfo($"{reference.GetAge()} {entity.Index} age {ageInDays} school {num} failed {reference.GetFailedEducationCount()} prob {graduationProbability}");
+                // Infixo: first check if graduation is possible
+                bool gradPossible = false;
+                switch (num)
+                {
+                    case 1: // elementary school - when approaching Teen age
+                        gradPossible = (RealPop.Systems.AgingSystem_RealPop.GetTeenAgeLimitInDays() - ageInDays) <= 1;
+                        break;
+                    case 2: // high school - after min years in school
+                        gradPossible = (ageInDays - RealPop.Systems.AgingSystem_RealPop.GetTeenAgeLimitInDays()) >= s_Education2InDays;
+                        break;
+                    case 3: // college - depends if Teen or Adult
+                        if (reference.GetAge() == CitizenAge.Teen)
+                        {
+                            gradPossible = (ageInDays - RealPop.Systems.AgingSystem_RealPop.GetTeenAgeLimitInDays()) >= s_Education2InDays + s_Education3InDays;
+                        }
+                        else // Adult
+                        {
+                            gradPossible = (ageInDays - RealPop.Systems.AgingSystem_RealPop.GetAdultAgeLimitInDays()) >= s_Education3InDays;
+                        }
+                        break;
+                    case 4: // university - after min years in school
+                        gradPossible = (ageInDays - RealPop.Systems.AgingSystem_RealPop.GetAdultAgeLimitInDays()) >= s_Education4InDays;
+                        break;
+                    default:
+                        break;
+                }
+                if (!gradPossible)
+                {
+                    // too early to graduate
+                    //Plugin.Logger.LogInfo(logmsg + $" TOOEARLY");
+                    continue;
+                }
                 if (random.NextFloat() < graduationProbability)
                 {
-                    //if (num==2) Plugin.Logger.LogInfo($"Entity {entity.Index} graduated to level {num}");
+                    //Plugin.Logger.LogInfo(logmsg + $" GRADUATED");
                     reference.SetEducationLevel(Mathf.Max(reference.GetEducationLevel(), num));
                     if (num > 1)
                     {
@@ -134,11 +171,11 @@ public class GraduationSystem_RealPop : GameSystemBase
                 }
                 if (num > 1)
                 {
-                    //if (num==2) Plugin.Logger.LogInfo($"Entity {entity.Index} FAILED");
+                    //Plugin.Logger.LogInfo(logmsg + $" FAILED");
                     int failedEducationCount = reference.GetFailedEducationCount();
                     if (failedEducationCount >= 3)
                     {
-                        //if (num==2) Plugin.Logger.LogInfo($"Entity {entity.Index} REMOVED");
+                        //Plugin.Logger.LogInfo(logmsg + $" REMOVED");
                         LeaveSchool(unfilteredChunkIndex, entity, school);
                         m_TriggerBuffer.Enqueue(new TriggerAction(TriggerType.CitizenFailedSchool, Entity.Null, entity, school));
                         continue;
@@ -150,6 +187,7 @@ public class GraduationSystem_RealPop : GameSystemBase
                 dropoutProbability = 1f - math.pow(math.saturate(1f - dropoutProbability), 32f);
                 if (random.NextFloat() < dropoutProbability)
                 {
+                    //Plugin.Logger.LogInfo(logmsg + $" DROPOUT");
                     LeaveSchool(unfilteredChunkIndex, entity, school);
                     m_TriggerBuffer.Enqueue(new TriggerAction(TriggerType.CitizenDroppedOutSchool, Entity.Null, entity, school));
                 }
@@ -245,6 +283,10 @@ public class GraduationSystem_RealPop : GameSystemBase
     private EntityQuery __query_1855827631_0;
 
     private EntityQuery __query_1855827631_1;
+
+    private static float s_Education2InDays; // high school
+    private static float s_Education3InDays; // college
+    private static float s_Education4InDays; // university
 
     private static float s_GraduationLevel1; // elementary school
     private static float s_GraduationLevel2; // high school
@@ -345,11 +387,14 @@ public class GraduationSystem_RealPop : GameSystemBase
         RequireForUpdate<EconomyParameterData>();
         RequireForUpdate<TimeData>();
         // Infixo
+        s_Education2InDays = Plugin.Education2InDays.Value;
+        s_Education3InDays = Plugin.Education3InDays.Value;
+        s_Education4InDays = Plugin.Education4InDays.Value;
         s_GraduationLevel1 = Plugin.GraduationLevel1.Value;
         s_GraduationLevel2 = Plugin.GraduationLevel2.Value;
         s_GraduationLevel3 = Plugin.GraduationLevel3.Value;
         s_GraduationLevel4 = Plugin.GraduationLevel4.Value;
-        Plugin.Logger.LogInfo($"Modded GraduationSystem created. Graduation params: {s_GraduationLevel1}, {s_GraduationLevel2}, {s_GraduationLevel3}, {s_GraduationLevel4}");
+        Plugin.Logger.LogInfo($"Modded GraduationSystem created. School days: {s_Education2InDays}, {s_Education3InDays}, {s_Education4InDays}. Graduation params: {s_GraduationLevel1}, {s_GraduationLevel2}, {s_GraduationLevel3}, {s_GraduationLevel4}");
     }
 
     [Preserve]

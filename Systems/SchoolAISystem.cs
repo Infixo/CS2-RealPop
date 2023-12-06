@@ -94,7 +94,7 @@ public class SchoolAISystem_RealPop : GameSystemBase
                 DynamicBuffer<Game.Buildings.Student> dynamicBuffer = bufferAccessor3[i];
                 float num = 0f;
                 float num2 = 0f;
-                int num3 = 0;
+                int num3 = 0; // number of students
                 for (int num4 = dynamicBuffer.Length - 1; num4 >= 0; num4--)
                 {
                     if (m_Students.TryGetComponent(dynamicBuffer[num4], out var componentData2) && m_Citizens.TryGetComponent(dynamicBuffer[num4], out var componentData3))
@@ -111,7 +111,30 @@ public class SchoolAISystem_RealPop : GameSystemBase
                             float graduationProbability = GraduationSystem_RealPop.GetGraduationProbability(componentData2.m_Level, componentData3.m_WellBeing, componentData, modifiers, 0.5f, efficiency);
                             if (graduationProbability > 0.001f)
                             {
-                                num += math.min(4f, (float)failedEducationCount + 0.5f - 1f / math.log2(1f - math.saturate(graduationProbability))) / 1f;
+                                // Infixo: new formula here
+                                //num += math.min(4f, (float)failedEducationCount + 0.5f - 1f / math.log2(1f - math.saturate(graduationProbability))) / 1f;
+                                // componentData2.m_Level is school type
+                                // time is sum of: min school time, failed years, and part that is still ahead
+                                if (componentData2.m_Level == 1) // elementary
+                                {
+                                    num += (float)RealPop.Systems.AgingSystem_RealPop.GetTeenAgeLimitInDays() - 0.5f;
+                                }
+                                else
+                                {
+                                    // school min years
+                                    if (componentData2.m_Level == 2)
+                                        num += (float)Plugin.Education2InDays.Value;
+                                    else if (componentData2.m_Level == 3)
+                                        num += (float)Plugin.Education3InDays.Value;
+                                    else
+                                        num += (float)Plugin.Education4InDays.Value;
+                                    // failed years
+                                    num += (float)failedEducationCount;
+                                    // part still ahead; for simplicity it assumes 1 extra attempt
+                                    // so we gonna be half a year with grad prob, or 1.5 years with (1-grad) prob
+                                    float satGradProb = math.saturate(graduationProbability);
+                                    num +=  satGradProb * 0.5f + (1f - satGradProb) * 1.5f;
+                                }
                                 float num5 = math.pow(1f - math.saturate(graduationProbability), 4f);
                                 float num6 = math.saturate(GraduationSystem_RealPop.GetDropoutProbability(componentData2.m_Level, componentData2.m_LastCommuteTime, fee, 0, ageInDays, 0.5f, failedEducationCount, graduationProbability, ref m_EconomyParameters));
                                 num2 += math.saturate(num5 + num6);
@@ -133,6 +156,7 @@ public class SchoolAISystem_RealPop : GameSystemBase
                 {
                     reference.m_AverageGraduationTime = num / (float)num3;
                     reference.m_AverageFailProbability = num2 / (float)num3;
+                    //Plugin.Logger.LogInfo($"Entity {prefab.Index} {num} {num3} => {reference.m_AverageGraduationTime}");
                 }
                 else
                 {
