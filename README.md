@@ -38,8 +38,8 @@ The goal of this mod is to rebalance population structure and education needs, t
 - Correct Average Time Spent in school calculations.
 
 ## Support
-- Please report bugs and issue on [GitHub] (https://github.com/Infixo/CS2-RealPop).
-- You may also leave comments on [Discord]( https://discord.com/channels/1169011184557637825/1181630312338444398).
+- Please report bugs and issue on [GitHub](https://github.com/Infixo/CS2-RealPop).
+- You may also leave comments on [Discord](https://discord.com/channels/1169011184557637825/1181630312338444398).
 
 ## Disclaimers and Notes
 > [!IMPORTANT]
