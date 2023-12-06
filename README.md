@@ -4,12 +4,12 @@ The goal of this mod is to rebalance population structure and education needs, t
 ## Features
 
 ### Lifecycle adjustments
-  - Default thresholds for licycle stages are changed from 21/36/84 to 12/24/77. As a result, population structure should be more realistic i.e. 15% Children, 10% Teens, 60% Adults and 15% Seniors. These are approximate numbers ofc, may differ in your cities.
+  - Default thresholds for licycle stages are changed from 21/36/84 to 12/21/75. As a result, population structure should be more realistic i.e. 15% Children, 10% Teens, 60% Adults and 15% Seniors. These are approximate numbers ofc, may differ in your cities.
   - The thresholds can be individually set in the config file.
 ### Graduation logic
   - Graduation process is more restrictive. Cims following typical education path will spend more time in High School, College and University. In Vanilla game they usually graduated after 1-2 days, rarely more. With this mod, they will spend a minimum number of days which is defined in the config file.
-  - Graduation probability is configurable.
-  - The graduation params can be individually set in the config file.
+  - By default: 3 days/years in High School, 4 days/years in College and 5 days/years in University.
+  - Graduation probability is also configurable. However, it doesn't affect time spent in schools much (give or take 1-2 days/years for some unlucky students).
 ### Education needs
   - As a result of the above changes, you should need less Elementary Schools, approx. 1 per 10000 citizens and a bit more High Schools, approx. 1 per 30000. College and University needs are not changed much, 1 College per 35000 and 1 University per 50-60 thousands cims.
   - Also, cims will stay longer in schools. Please note that "Average time to graduate" will now show the correct value in years, however year here is the same as day or month. So, don't be alarmed e.g. when you see 4 years. It means that cims on average will spend 4 in-game days or months in this school.
