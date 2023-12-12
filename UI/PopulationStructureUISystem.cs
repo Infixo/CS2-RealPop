@@ -12,23 +12,50 @@ using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using UnityEngine.Scripting;
+using Game.UI;
 
-namespace Game.UI.InGame;
+namespace RealPop.UI;
 
 // This System is based on PopulationInfoviewUISystem by CO
 [CompilerGenerated]
-public class PopulationInfoviewUISystem : InfoviewUISystemBase
+public class PopulationStructureUISystem : UISystemBase
 {
-    private enum Result
+    /// <summary>
+    /// Holds info about population at Age
+    /// </summary>
+    private struct PopulationAtAgeInfo
     {
-        Children,
-        Teens,
-        Adults,
-        Seniors,
-        Workers,
-        Jobs,
-        Students,
-        ResultCount
+        public int Age;
+        public int Total; // asserion: Total is a sum of the below parts
+        public int School1; // elementary school
+        public int School2; // high school
+        public int School3; // college
+        public int School4; // university
+        public int Work; // working
+        public int Other; // not working, not student
+        public PopulationAtAgeInfo(int _age) { Age = _age; }
+    }
+
+    private static void WriteData(IJsonWriter writer, PopulationAtAgeInfo info)
+    {
+        writer.TypeBegin("populationAtAgeInfo");
+        writer.PropertyName("age");
+        writer.Write(info.Age);
+        writer.PropertyName("total");
+        writer.Write(info.Total);
+        writer.PropertyName("school1");
+        writer.Write(info.School1);
+        writer.PropertyName("school2");
+        writer.Write(info.School2);
+        writer.PropertyName("school3");
+        writer.Write(info.School3);
+        writer.PropertyName("school4");
+        writer.Write(info.School4);
+        writer.PropertyName("work");
+        writer.Write(info.Work);
+        writer.PropertyName("other");
+        writer.Write(info.Other);
+        writer.TypeEnd();
     }
 
     [BurstCompile]
@@ -183,25 +210,25 @@ public class PopulationInfoviewUISystem : InfoviewUISystemBase
 
     private const string kGroup = "populationInfo";
 
-    private CityStatisticsSystem m_CityStatisticsSystem;
+    //private CityStatisticsSystem m_CityStatisticsSystem;
 
     private CitySystem m_CitySystem;
 
-    private ValueBinding<int> m_Population;
+    //private ValueBinding<int> m_Population;
 
-    private ValueBinding<int> m_Employed;
+    //private ValueBinding<int> m_Employed;
 
-    private ValueBinding<int> m_Jobs;
+    //private ValueBinding<int> m_Jobs;
 
-    private ValueBinding<float> m_Unemployment;
+    //private ValueBinding<float> m_Unemployment;
 
-    private ValueBinding<int> m_BirthRate;
+    //private ValueBinding<int> m_BirthRate;
 
-    private ValueBinding<int> m_DeathRate;
+    //private ValueBinding<int> m_DeathRate;
 
-    private ValueBinding<int> m_MovedIn;
+    //private ValueBinding<int> m_MovedIn;
 
-    private ValueBinding<int> m_MovedAway;
+    //private ValueBinding<int> m_MovedAway;
 
     private RawValueBinding m_AgeData;
 
@@ -211,33 +238,20 @@ public class PopulationInfoviewUISystem : InfoviewUISystemBase
 
     private EntityQuery m_WorkProviderModifiedQuery;
 
-    private NativeArray<int> m_Results;
+    private NativeArray<PopulationAtAgeInfo> m_Results; // final results, will be filled via jobs and then written as output
 
     private TypeHandle __TypeHandle;
-
-    protected override bool Active
-    {
-        get
-        {
-            if (!base.Active && !m_Population.active && !m_Employed.active && !m_Jobs.active && !m_Unemployment.active && !m_BirthRate.active && !m_DeathRate.active && !m_MovedIn.active && !m_MovedAway.active)
-            {
-                return m_AgeData.active;
-            }
-            return true;
-        }
-    }
-
-    protected override bool Modified => !m_WorkProviderModifiedQuery.IsEmptyIgnoreFilter;
 
     [Preserve]
     protected override void OnCreate()
     {
         base.OnCreate();
-        m_CityStatisticsSystem = base.World.GetOrCreateSystemManaged<CityStatisticsSystem>();
+        //m_CityStatisticsSystem = base.World.GetOrCreateSystemManaged<CityStatisticsSystem>();
         m_CitySystem = base.World.GetOrCreateSystemManaged<CitySystem>();
         m_HouseholdQuery = GetEntityQuery(ComponentType.ReadOnly<Household>(), ComponentType.ReadOnly<HouseholdCitizen>(), ComponentType.Exclude<PropertySeeker>(), ComponentType.Exclude<TouristHousehold>(), ComponentType.Exclude<CommuterHousehold>(), ComponentType.Exclude<MovingAway>());
         m_WorkProviderQuery = GetEntityQuery(ComponentType.ReadOnly<WorkProvider>(), ComponentType.Exclude<PropertySeeker>(), ComponentType.Exclude<Native>(), ComponentType.Exclude<Deleted>(), ComponentType.Exclude<Temp>());
         m_WorkProviderModifiedQuery = GetEntityQuery(ComponentType.ReadOnly<WorkProvider>(), ComponentType.ReadOnly<Created>(), ComponentType.ReadOnly<Deleted>(), ComponentType.ReadOnly<Updated>(), ComponentType.Exclude<Temp>());
+        /*
         AddBinding(m_Population = new ValueBinding<int>("populationInfo", "population", 0));
         AddBinding(m_Employed = new ValueBinding<int>("populationInfo", "employed", 0));
         AddBinding(m_Jobs = new ValueBinding<int>("populationInfo", "jobs", 0));
@@ -246,15 +260,44 @@ public class PopulationInfoviewUISystem : InfoviewUISystemBase
         AddBinding(m_DeathRate = new ValueBinding<int>("populationInfo", "deathRate", 0));
         AddBinding(m_MovedIn = new ValueBinding<int>("populationInfo", "movedIn", 0));
         AddBinding(m_MovedAway = new ValueBinding<int>("populationInfo", "movedAway", 0));
-        AddBinding(m_AgeData = new RawValueBinding("populationInfo", "ageData", delegate(IJsonWriter binder)
+        */
+        /*
+        AddBinding(m_ProductionCompanyInfoBinding = new RawValueBinding(kGroup, "productionCompanyInfo", delegate (IJsonWriter binder)
         {
-            int children = m_Results[0];
-            int teens = m_Results[1];
-            int adults = m_Results[2];
-            int seniors = m_Results[3];
-            UpdateAgeDataBinding(binder, children, teens, adults, seniors);
+            binder.ArrayBegin(kLevels);
+            for (int i = 0; i < kLevels; i++)
+            {
+                binder.TypeBegin("production.ProductionCompanyInfo");
+                binder.PropertyName("industrialCompanies");
+                binder.Write(0);
+                binder.PropertyName("industrialWorkers");
+                binder.Write(0);
+                binder.PropertyName("commercialCompanies");
+                binder.Write(0);
+                binder.PropertyName("commercialWorkers");
+                binder.Write(0);
+                binder.TypeEnd();
+            }
+            binder.ArrayEnd();
         }));
-        m_Results = new NativeArray<int>(7, Allocator.Persistent);
+        */
+
+
+        AddBinding(m_AgeData = new RawValueBinding(kGroup, "structure", delegate(IJsonWriter binder)
+        {
+            //binder.TypeBegin("populationStructure");
+            //binder.PropertyName("values");
+            binder.ArrayBegin(m_Results.Length);
+            for (int i = 0; i < m_Results.Length; i++)
+            {
+                WriteData(binder, m_Results[i]);
+            }
+            binder.ArrayEnd();
+            //binder.TypeEnd();
+            //UpdateAgeDataBinding(binder, m_Results);
+        }));
+        m_Results = new NativeArray<PopulationAtAgeInfo>(20, Allocator.Persistent); // INFIXO: TODO
+        Plugin.Log("ProductionStructureUISystem created.");
     }
 
     [Preserve]
@@ -264,14 +307,11 @@ public class PopulationInfoviewUISystem : InfoviewUISystemBase
         base.OnDestroy();
     }
 
-    protected override void PerformUpdate()
+    protected override void OnUpdate()
     {
-        UpdateBindings();
-    }
-
-    private void UpdateBindings()
-    {
+        base.OnUpdate();
         ResetResults();
+        /* INFIXO
         __TypeHandle.__Game_Citizens_Student_RO_ComponentLookup.Update(ref base.CheckedStateRef);
         __TypeHandle.__Game_Citizens_HealthProblem_RO_ComponentLookup.Update(ref base.CheckedStateRef);
         __TypeHandle.__Game_Citizens_Citizen_RO_ComponentLookup.Update(ref base.CheckedStateRef);
@@ -292,29 +332,33 @@ public class PopulationInfoviewUISystem : InfoviewUISystemBase
         jobData2.m_WorkProviderHandle = __TypeHandle.__Game_Companies_WorkProvider_RO_ComponentTypeHandle;
         jobData2.m_Results = m_Results;
         JobChunkExtensions.Schedule(jobData2, m_WorkProviderQuery, base.Dependency).Complete();
-        int num = m_Results[2];
-        int num2 = m_Results[1];
-        int num3 = m_Results[4];
-        int newValue = m_Results[5];
-        int num4 = num2 + num - m_Results[6];
-        float newValue2 = (((float)num4 > 0f) ? ((float)(num4 - num3) / (float)num4 * 100f) : 0f);
-        m_Jobs.Update(newValue);
-        m_Employed.Update(num3);
-        m_Unemployment.Update(newValue2);
-        Population componentData = base.EntityManager.GetComponentData<Population>(m_CitySystem.City);
-        m_Population.Update(componentData.m_Population);
+        */
+        //int num = m_Results[2];
+        //int num2 = m_Results[1];
+        //int num3 = m_Results[4];
+        //int newValue = m_Results[5];
+        //int num4 = num2 + num - m_Results[6];
+        //float newValue2 = (((float)num4 > 0f) ? ((float)(num4 - num3) / (float)num4 * 100f) : 0f);
+        //m_Jobs.Update(newValue);
+        //m_Employed.Update(num3);
+        //m_Unemployment.Update(newValue2);
+        //Population componentData = base.EntityManager.GetComponentData<Population>(m_CitySystem.City);
+        //m_Population.Update(componentData.m_Population);
         m_AgeData.Update();
-        UpdateStatistics();
+        //UpdateStatistics();
+        //Plugin.Log("jobs",true);
     }
 
     private void ResetResults()
     {
         for (int i = 0; i < m_Results.Length; i++)
         {
-            m_Results[i] = 0;
+            m_Results[i] = new PopulationAtAgeInfo(i);
         }
+        //Plugin.Log("reset",true);
     }
 
+    /*
     private void UpdateAgeData(IJsonWriter binder)
     {
         int children = m_Results[0];
@@ -323,22 +367,24 @@ public class PopulationInfoviewUISystem : InfoviewUISystemBase
         int seniors = m_Results[3];
         UpdateAgeDataBinding(binder, children, teens, adults, seniors);
     }
-
-    private static void UpdateAgeDataBinding(IJsonWriter binder, int children, int teens, int adults, int seniors)
+    */
+    /*
+    private static void UpdateAgeDataBinding(IJsonWriter binder, NativeArray<PopulationAtAgeInfo> m_Results)
     {
-        binder.TypeBegin("infoviews.ChartData");
+        binder.TypeBegin("populationStructure");
         binder.PropertyName("values");
-        binder.ArrayBegin(4u);
-        binder.Write(children);
-        binder.Write(teens);
-        binder.Write(adults);
-        binder.Write(seniors);
+        binder.ArrayBegin(m_Results.Length);
+
+        for (int i = 0; i < m_Results.Length; i++)
+        {
+            WriteData(binder, m_Results[i]);
+        }
+
         binder.ArrayEnd();
-        binder.PropertyName("total");
-        binder.Write(children + teens + adults + seniors);
         binder.TypeEnd();
     }
-
+    */
+    /* Infixo: not used
     private void UpdateStatistics()
     {
         m_BirthRate.Update(m_CityStatisticsSystem.GetStatisticValue(StatisticType.BirthRate));
@@ -346,6 +392,7 @@ public class PopulationInfoviewUISystem : InfoviewUISystemBase
         m_MovedIn.Update(m_CityStatisticsSystem.GetStatisticValue(StatisticType.CitizensMovedIn));
         m_MovedAway.Update(m_CityStatisticsSystem.GetStatisticValue(StatisticType.CitizensMovedAway));
     }
+    */
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void __AssignQueries(ref SystemState state)
@@ -360,7 +407,7 @@ public class PopulationInfoviewUISystem : InfoviewUISystemBase
     }
 
     [Preserve]
-    public PopulationInfoviewUISystem()
+    public PopulationStructureUISystem()
     {
     }
 }

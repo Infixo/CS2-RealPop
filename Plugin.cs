@@ -22,12 +22,13 @@ public class Plugin : BaseUnityPlugin
     internal static new ManualLogSource Logger; // BepInEx logging
     private static ILog s_Log; // CO logging
 
-    public static void Log(string text)
+    public static void Log(string text, bool bMethod = false)
     {
-        //string msg = GetCallingMethod(2) + ": " + text;
+        if (bMethod) text = GetCallingMethod(2) + ": " + text;
         Logger.LogInfo(text);
         s_Log.Info(text);
     }
+
     public static void LogStack(string text)
     {
         //string msg = GetCallingMethod(2) + ": " + text + " STACKTRACE";

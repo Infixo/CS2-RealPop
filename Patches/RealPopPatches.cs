@@ -1,4 +1,5 @@
 using Game;
+using Game.UI.InGame;
 using HarmonyLib;
 using RealPop.Systems;
 using UnityEngine;
@@ -17,6 +18,7 @@ class RealPopPatches
         updateSystem.UpdateAt<GraduationSystem_RealPop>(SystemUpdatePhase.GameSimulation);
         updateSystem.UpdateAt<SchoolAISystem_RealPop>(SystemUpdatePhase.GameSimulation);
         updateSystem.UpdateAt<CitizenInitializeSystem_RealPop>(SystemUpdatePhase.Modification5);
+        updateSystem.UpdateAt<RealPop.UI.PopulationStructureUISystem>(SystemUpdatePhase.UIUpdate);
     }
 
     [HarmonyPatch(typeof(Game.Simulation.AgingSystem), "OnUpdate")]
