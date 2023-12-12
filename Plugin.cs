@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using BepInEx;
@@ -7,6 +8,7 @@ using BepInEx.Configuration;
 using HarmonyLib;
 using System.Collections.Generic;
 using System.Text;
+using Colossal.Logging;
 
 #if BEPINEX_V6
     using BepInEx.Unity.Mono;
@@ -17,10 +19,36 @@ namespace RealPop;
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
 public class Plugin : BaseUnityPlugin
 {
-    internal static new ManualLogSource Logger;
-	
-	// mod settings
-	public static ConfigEntry<int> TeenAgeLimitInDays;
+    internal static new ManualLogSource Logger; // BepInEx logging
+    private static ILog s_Log; // CO logging
+
+    public static void Log(string text)
+    {
+        //string msg = GetCallingMethod(2) + ": " + text;
+        Logger.LogInfo(text);
+        s_Log.Info(text);
+    }
+    public static void LogStack(string text)
+    {
+        //string msg = GetCallingMethod(2) + ": " + text + " STACKTRACE";
+        Logger.LogInfo(text + " STACKTRACE");
+        s_Log.logStackTrace = true;
+        s_Log.Info(text + "STACKTRACE");
+        s_Log.logStackTrace = false;
+    }
+
+    /// <summary>
+    /// Gets the method from the specified <paramref name="frame"/>.
+    /// </summary>
+    public static string GetCallingMethod(int frame)
+    {
+        StackTrace st = new StackTrace();
+        MethodBase mb = st.GetFrame(frame).GetMethod(); // 0 - GetCallingMethod, 1 - Log, 2 - actual function calling a Log method
+        return mb.DeclaringType + "." + mb.Name;
+    }
+
+    // mod settings
+    public static ConfigEntry<int> TeenAgeLimitInDays;
 	public static ConfigEntry<int> AdultAgeLimitInDays;
 	public static ConfigEntry<int> ElderAgeLimitInDays;
     public static ConfigEntry<int> Education2InDays; // high school
@@ -34,6 +62,9 @@ public class Plugin : BaseUnityPlugin
     private void Awake()
     {
         Logger = base.Logger;
+
+        // CO logging standard as described here https://cs2.paradoxwikis.com/Logging
+        s_Log = LogManager.GetLogger(MyPluginInfo.PLUGIN_NAME);
 
         TeenAgeLimitInDays = base.Config.Bind<int>("Lifecycle", "TeenAgeLimitInDays", 12, "When Children become Teens; Vanilla 21");
         AdultAgeLimitInDays = base.Config.Bind<int>("Lifecycle", "AdultAgeLimitInDays", 21, "When Teens become Adults; Vanilla 36");
