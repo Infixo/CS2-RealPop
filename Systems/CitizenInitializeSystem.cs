@@ -183,6 +183,7 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
                 citizen.m_BirthDay = (short)(TimeSystem.GetDay(m_SimulationFrame, m_TimeData) - num2);
                 m_Citizens[entity] = citizen;
             }
+            //Plugin.Log($"InitializeCitizenJob: frame {m_SimulationFrame} finished");
         }
     }
 
@@ -213,6 +214,22 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
             __Game_Citizens_MailSender_RW_ComponentLookup = state.GetComponentLookup<MailSender>();
             __Game_Citizens_CrimeVictim_RW_ComponentLookup = state.GetComponentLookup<CrimeVictim>();
             __Game_Prefabs_CitizenData_RO_ComponentLookup = state.GetComponentLookup<CitizenData>(isReadOnly: true);
+        }
+    }
+
+    // Infixo: Job to dispose the allocated memory
+    private struct DisposeJob : IJob
+    {
+        public uint m_Frame;
+        public NativeArray<Entity> m_ToDispose1;
+        public NativeArray<Entity> m_ToDispose2;
+
+        public void Execute()
+        {
+            // Dispose of the NativeArray
+            m_ToDispose1.Dispose();
+            m_ToDispose2.Dispose();
+            Plugin.Log($"Disposed: from frame {m_Frame}");
         }
     }
 
@@ -277,7 +294,15 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
         initializeCitizenJob.m_CommandBuffer = m_EndFrameBarrier.CreateCommandBuffer();
         initializeCitizenJob.m_TriggerBuffer = m_TriggerSystem.CreateActionBuffer();
         InitializeCitizenJob jobData = initializeCitizenJob;
+        //Plugin.Log($"AllocTemp: frame {m_SimulationSystem.frameIndex}");// entities {initializeCitizenJob.m_Entities.Length} citizens {initializeCitizenJob.m_CitizenPrefabs.Length}");
         base.Dependency = IJobExtensions.Schedule(jobData, JobHandle.CombineDependencies(base.Dependency, outJobHandle));
+        // Infixo: Dispose of the NativeArray when the job completes
+        //DisposeJob disposeJob = default(DisposeJob);
+        //disposeJob.m_Frame = initializeCitizenJob.m_SimulationFrame;
+        //disposeJob.m_ToDispose1 = initializeCitizenJob.m_Entities;
+        //disposeJob.m_ToDispose2 = initializeCitizenJob.m_CitizenPrefabs;
+        //DisposeJob jobData2 = disposeJob;
+        //base.Dependency = IJobExtensions.Schedule(jobData2, base.Dependency); //   new YourDisposeJob { YourNativeArray = yourNativeArray }.Schedule(jobHandle);
         m_EndFrameBarrier.AddJobHandleForProducer(base.Dependency);
     }
 
