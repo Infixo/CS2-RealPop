@@ -13,6 +13,7 @@ using Unity.Collections;
 using Unity.Entities;
 using UnityEngine.Scripting;
 using Game.UI;
+using Game;
 
 namespace RealPop.UI;
 
@@ -79,10 +80,11 @@ public class PopulationStructureUISystem : UISystemBase
         [ReadOnly]
         public ComponentLookup<Student> m_Students;
 
-        public NativeArray<int> m_Results;
+        public NativeArray<PopulationAtAgeInfo> m_Results;
 
         public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
         {
+            //Plugin.Log($"Execute: {chunk.Count} entities");
             BufferAccessor<HouseholdCitizen> bufferAccessor = chunk.GetBufferAccessor(ref m_HouseholdCitizenHandle);
             NativeArray<Household> nativeArray = chunk.GetNativeArray(ref m_HouseholdType);
             int num = 0;
@@ -135,12 +137,19 @@ public class PopulationStructureUISystem : UISystemBase
                     }
                 }
             }
-            m_Results[0] += num;
-            m_Results[1] += num2;
-            m_Results[2] += num3;
-            m_Results[3] += num4;
-            m_Results[4] += num5;
-            m_Results[6] += num6;
+            // Work with a local variable to avoid CS0206 error
+            PopulationAtAgeInfo elem0 = m_Results[0];
+            elem0.School1 = num;
+            elem0.School2 = num2;
+            elem0.School3 = num3;
+            elem0.School4 = num4;
+            m_Results[0] = elem0;
+            //m_Results[0].Total += num;
+            //m_Results[1].Total += num2;
+            //m_Results[2].Total += num3;
+            //m_Results[3].Total += num4;
+            //m_Results[4].Total += num5;
+            //m_Results[6].Total += num6;
         }
 
         void IJobChunk.Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
@@ -242,6 +251,11 @@ public class PopulationStructureUISystem : UISystemBase
 
     private TypeHandle __TypeHandle;
 
+    public override int GetUpdateInterval(SystemUpdatePhase phase)
+    {
+        return 128; // approx. twice per minute on normal speed
+    }
+
     [Preserve]
     protected override void OnCreate()
     {
@@ -251,37 +265,6 @@ public class PopulationStructureUISystem : UISystemBase
         m_HouseholdQuery = GetEntityQuery(ComponentType.ReadOnly<Household>(), ComponentType.ReadOnly<HouseholdCitizen>(), ComponentType.Exclude<PropertySeeker>(), ComponentType.Exclude<TouristHousehold>(), ComponentType.Exclude<CommuterHousehold>(), ComponentType.Exclude<MovingAway>());
         m_WorkProviderQuery = GetEntityQuery(ComponentType.ReadOnly<WorkProvider>(), ComponentType.Exclude<PropertySeeker>(), ComponentType.Exclude<Native>(), ComponentType.Exclude<Deleted>(), ComponentType.Exclude<Temp>());
         m_WorkProviderModifiedQuery = GetEntityQuery(ComponentType.ReadOnly<WorkProvider>(), ComponentType.ReadOnly<Created>(), ComponentType.ReadOnly<Deleted>(), ComponentType.ReadOnly<Updated>(), ComponentType.Exclude<Temp>());
-        /*
-        AddBinding(m_Population = new ValueBinding<int>("populationInfo", "population", 0));
-        AddBinding(m_Employed = new ValueBinding<int>("populationInfo", "employed", 0));
-        AddBinding(m_Jobs = new ValueBinding<int>("populationInfo", "jobs", 0));
-        AddBinding(m_Unemployment = new ValueBinding<float>("populationInfo", "unemployment", 0f));
-        AddBinding(m_BirthRate = new ValueBinding<int>("populationInfo", "birthRate", 0));
-        AddBinding(m_DeathRate = new ValueBinding<int>("populationInfo", "deathRate", 0));
-        AddBinding(m_MovedIn = new ValueBinding<int>("populationInfo", "movedIn", 0));
-        AddBinding(m_MovedAway = new ValueBinding<int>("populationInfo", "movedAway", 0));
-        */
-        /*
-        AddBinding(m_ProductionCompanyInfoBinding = new RawValueBinding(kGroup, "productionCompanyInfo", delegate (IJsonWriter binder)
-        {
-            binder.ArrayBegin(kLevels);
-            for (int i = 0; i < kLevels; i++)
-            {
-                binder.TypeBegin("production.ProductionCompanyInfo");
-                binder.PropertyName("industrialCompanies");
-                binder.Write(0);
-                binder.PropertyName("industrialWorkers");
-                binder.Write(0);
-                binder.PropertyName("commercialCompanies");
-                binder.Write(0);
-                binder.PropertyName("commercialWorkers");
-                binder.Write(0);
-                binder.TypeEnd();
-            }
-            binder.ArrayEnd();
-        }));
-        */
-
 
         AddBinding(m_AgeData = new RawValueBinding(kGroup, "structure", delegate(IJsonWriter binder)
         {
@@ -311,7 +294,7 @@ public class PopulationStructureUISystem : UISystemBase
     {
         base.OnUpdate();
         ResetResults();
-        /* INFIXO
+        // main job that processess the households, so we can skip cims that have not yet moved in
         __TypeHandle.__Game_Citizens_Student_RO_ComponentLookup.Update(ref base.CheckedStateRef);
         __TypeHandle.__Game_Citizens_HealthProblem_RO_ComponentLookup.Update(ref base.CheckedStateRef);
         __TypeHandle.__Game_Citizens_Citizen_RO_ComponentLookup.Update(ref base.CheckedStateRef);
@@ -327,6 +310,7 @@ public class PopulationStructureUISystem : UISystemBase
         jobData.m_Students = __TypeHandle.__Game_Citizens_Student_RO_ComponentLookup;
         jobData.m_Results = m_Results;
         JobChunkExtensions.Schedule(jobData, m_HouseholdQuery, base.Dependency).Complete();
+        /* INFIXO
         __TypeHandle.__Game_Companies_WorkProvider_RO_ComponentTypeHandle.Update(ref base.CheckedStateRef);
         WorkProviderJob jobData2 = default(WorkProviderJob);
         jobData2.m_WorkProviderHandle = __TypeHandle.__Game_Companies_WorkProvider_RO_ComponentTypeHandle;
