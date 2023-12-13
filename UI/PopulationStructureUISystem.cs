@@ -97,7 +97,7 @@ public class PopulationStructureUISystem : UISystemBase
 
         public TimeData m_TimeData;
 
-        public uint m_UpdateFrameIndex;
+        //public uint m_UpdateFrameIndex;
         
         public uint m_SimulationFrame;
 
@@ -254,32 +254,7 @@ public class PopulationStructureUISystem : UISystemBase
             Execute(in chunk, unfilteredChunkIndex, useEnabledMask, in chunkEnabledMask);
         }
     }
-    /* this job counts workplaces
-    [BurstCompile]
-    private struct WorkProviderJob : IJobChunk
-    {
-        [ReadOnly]
-        public ComponentTypeHandle<WorkProvider> m_WorkProviderHandle;
 
-        public NativeArray<PopulationAtAgeInfo> m_Results;
-
-        public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
-        {
-            NativeArray<WorkProvider> entities = chunk.GetNativeArray(ref m_WorkProviderHandle);
-            int ageInDays = 0;
-            for (int i = 0; i < entities.Length; i++)
-            {
-                ageInDays += entities[i].m_MaxWorkers;
-            }
-            m_Results[5] += ageInDays;
-        }
-
-        void IJobChunk.Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
-        {
-            Execute(in chunk, unfilteredChunkIndex, useEnabledMask, in chunkEnabledMask);
-        }
-    }
-    */
     private struct TypeHandle
     {
         [ReadOnly]
@@ -347,7 +322,7 @@ public class PopulationStructureUISystem : UISystemBase
     private CitySystem m_CitySystem;
 
     private SimulationSystem m_SimulationSystem;
-    
+
     //private ValueBinding<int> m_Population;
 
     //private ValueBinding<int> m_Employed;
@@ -364,11 +339,13 @@ public class PopulationStructureUISystem : UISystemBase
 
     //private ValueBinding<int> m_MovedAway;
 
-    private RawValueBinding m_AgeData;
+    private RawValueBinding m_uiTotals;
+
+    private RawValueBinding m_uiResults;
 
     private EntityQuery m_TimeDataQuery;
     
-    private EntityQuery m_HouseholdQuery;
+    //private EntityQuery m_HouseholdQuery;
 
     private EntityQuery m_CitizenQuery;
 
@@ -387,11 +364,6 @@ public class PopulationStructureUISystem : UISystemBase
     private NativeArray<PopulationAtAgeInfo> m_Results; // final results, will be filled via jobs and then written as output
 
     private TypeHandle __TypeHandle;
-
-    public override int GetUpdateInterval(SystemUpdatePhase phase)
-    {
-        return 128; // approx. twice per minute on normal speed
-    }
 
     [Preserve]
     protected override void OnCreate()
@@ -425,11 +397,13 @@ public class PopulationStructureUISystem : UISystemBase
         //m_WorkProviderQuery = GetEntityQuery(ComponentType.ReadOnly<WorkProvider>(), ComponentType.Exclude<PropertySeeker>(), ComponentType.Exclude<Native>(), ComponentType.Exclude<Deleted>(), ComponentType.Exclude<Temp>());
         //m_WorkProviderModifiedQuery = GetEntityQuery(ComponentType.ReadOnly<WorkProvider>(), ComponentType.ReadOnly<Created>(), ComponentType.ReadOnly<Deleted>(), ComponentType.ReadOnly<Updated>(), ComponentType.Exclude<Temp>());
 
-        AddBinding(m_AgeData = new RawValueBinding(kGroup, "structure", delegate(IJsonWriter binder)
+        AddBinding(m_uiTotals = new RawValueBinding(kGroup, "structureTotals", delegate (IJsonWriter binder)
         {
             // city level info
-            //binder.TypeBegin("totals");
-            
+            binder.ArrayBegin(m_Totals.Length);
+            for (int i = 0; i < m_Totals.Length; i++)
+                binder.Write(m_Totals[i]);
+            /* this display [ xxx, xxx, xxx, xxx, xxx ], there are no property names
             binder.PropertyName("citizens");
             binder.Write(m_Totals[0]);
             binder.PropertyName("locals");
@@ -442,20 +416,20 @@ public class PopulationStructureUISystem : UISystemBase
             binder.Write(m_Totals[4]);
             binder.PropertyName("workers");
             binder.Write(m_Totals[5]);
-            
-            //binder.TypeEnd();
-            // array for info per age
-            //binder.TypeBegin("values");
-            /*
+            */
+            binder.ArrayEnd();
+        }));
+
+        AddBinding(m_uiResults = new RawValueBinding(kGroup, "structureDetails", delegate(IJsonWriter binder)
+        {
             binder.ArrayBegin(m_Results.Length);
             for (int i = 0; i < m_Results.Length; i++)
             {
                 WriteData(binder, m_Results[i]);
             }
             binder.ArrayEnd();
-            */
-            //binder.TypeEnd();
         }));
+
         // allocate memory for results
         m_Totals = new NativeArray<int>(6, Allocator.Persistent);
         m_Results = new NativeArray<PopulationAtAgeInfo>(20, Allocator.Persistent); // INFIXO: TODO
@@ -472,17 +446,12 @@ public class PopulationStructureUISystem : UISystemBase
 
     protected override void OnUpdate()
     {
-
-        uint frame = m_SimulationSystem.frameIndex;
-        if (frame % 128 != 77)
-        {
+        if (m_SimulationSystem.frameIndex % 128 != 77)
             return;
-        }
 
-        Plugin.Log($"OnUpdate at frame {frame}");
+        //Plugin.Log($"OnUpdate at frame {m_SimulationSystem.frameIndex}");
         base.OnUpdate();
         ResetResults();
-
 
         // code based on AgingJob
 
@@ -512,12 +481,12 @@ public class PopulationStructureUISystem : UISystemBase
         //structureJob.m_UpdateFrameIndex = updateFrame;
         //structureJob.m_CommandBuffer = m_EndFrameBarrier.CreateCommandBuffer().AsParallelWriter();
         //structureJob.m_DebugAgeAllCitizens = s_DebugAgeAllCitizens;
-        PopulationStructureJob jobData = structureJob;
+        //PopulationStructureJob jobData = structureJob;
         //base.Dependency = JobChunkExtensions.ScheduleParallel(jobData, m_CitizenGroup, base.Dependency);
         //m_EndFrameBarrier.AddJobHandleForProducer(base.Dependency); // Infixo: frame barrier is not used because we wait to complete the job
-        jobData.m_Totals = m_Totals;
-        jobData.m_Results = m_Results;
-        JobChunkExtensions.Schedule(jobData, m_CitizenQuery, base.Dependency).Complete();
+        structureJob.m_Totals = m_Totals;
+        structureJob.m_Results = m_Results;
+        JobChunkExtensions.Schedule(structureJob, m_CitizenQuery, base.Dependency).Complete();
 
 
         // main job that processess the households, so we can skip cims that have not yet moved in
@@ -559,13 +528,14 @@ public class PopulationStructureUISystem : UISystemBase
         //Population componentData = base.EntityManager.GetComponentData<Population>(m_CitySystem.City);
         //m_Population.Update(componentData.m_Population);
 
-        //m_AgeData.Update();
         Plugin.Log($"results: {m_Totals[0]} {m_Totals[1]} {m_Totals[2]} {m_Totals[3]} students {m_Totals[4]} workers {m_Totals[5]}");
         for (int i = 0; i < m_Results.Length; i++)
         {
             PopulationAtAgeInfo info = m_Results[i];
             Plugin.Log($"...[{i}]: {info.Age} {info.Total} students {info.School1} {info.School2} {info.School3} {info.School4} workers {info.Work} other {info.Other}");
         }
+        m_uiTotals.Update();
+        m_uiResults.Update();
 
         //UpdateStatistics();
         //Plugin.Log("jobs",true);
