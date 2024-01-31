@@ -59,7 +59,8 @@ At the end you should see the changes in population structure and education grou
 - You may also leave comments on [Discord1](https://discord.com/channels/1169011184557637825/1198628199207292929) or [Discord2](https://discord.com/channels/1024242828114673724/1183857600098480237).
 
 ## Disclaimers and Notes
-> [!Credits]
+
+> [!NOTE]
 The mod uses Cities: Skylines 2 Mod Template by Captain-Of-Coit.
 
 > [!IMPORTANT]

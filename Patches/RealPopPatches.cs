@@ -1,5 +1,4 @@
 using Game;
-using Game.UI.InGame;
 using HarmonyLib;
 using RealPop.Systems;
 using UnityEngine;
@@ -18,7 +17,6 @@ class RealPopPatches
         updateSystem.UpdateAt<GraduationSystem_RealPop>(SystemUpdatePhase.GameSimulation);
         updateSystem.UpdateAt<SchoolAISystem_RealPop>(SystemUpdatePhase.GameSimulation);
         updateSystem.UpdateAt<CitizenInitializeSystem_RealPop>(SystemUpdatePhase.Modification5);
-        updateSystem.UpdateAt<RealPop.UI.PopulationStructureUISystem>(SystemUpdatePhase.UIUpdate);
     }
 
     [HarmonyPatch(typeof(Game.Simulation.AgingSystem), "OnUpdate")]
@@ -83,65 +81,3 @@ class RealPopPatches
     }
 #endif
 }
-/*
-    [HarmonyPrefix, HarmonyPatch(typeof(Game.Simulation.AgingSystem), "GetTeenAgeLimitInDays")]
-    static bool GetTeenAgeLimitInDays_Prefix(ref int __result)
-    {
-        RealPop.Debug.Log("GetTeenAgeLimitInDays_Prefix");
-        __result = 12; // 21
-        return false; // don't execute the original method after this
-    }
-
-    [HarmonyPrefix, HarmonyPatch(typeof(Game.Simulation.AgingSystem), "GetAdultAgeLimitInDays")]
-    static bool GetAdultAgeLimitInDays_Prefix(ref int __result)
-    {
-        RealPop.Debug.Log("GetAdultAgeLimitInDays_Prefix");
-        __result = 24; // 36
-        return false; // don't execute the original method after this
-    }
-
-    [HarmonyPrefix, HarmonyPatch(typeof(Game.Simulation.AgingSystem), "GetElderAgeLimitInDays")]
-    static bool GetElderAgeLimitInDays_Prefix(ref int __result)
-    {
-        RealPop.Debug.Log("GetElderAgeLimitInDays_Prefix");
-        __result = 77; // 84
-        return false; // don't execute the original method after this
-    }
-
-}
-*/
-
-
-/*
- * 
-// This example patch adds the loading of a custom ECS System after the AudioManager has
-// its "OnGameLoadingComplete" method called. We're just using it as a entrypoint, and
-// it won't affect anything related to audio.
-[HarmonyPatch(typeof(AudioManager), "OnGameLoadingComplete")]
-class AudioManager_OnGameLoadingComplete
-{
-    static void Postfix(AudioManager __instance, Colossal.Serialization.Entities.Purpose purpose, GameMode mode)
-    {
-        if (!mode.IsGameOrEditor())
-            return;
-
-        // Here we add our custom ECS System to the game's ECS World, so it's "online" at runtime
-        __instance.World.GetOrCreateSystem<RealPopSystem>();
-    }
-}
-
-// This example patch enables the editor in the main menu
-[HarmonyPatch(typeof(MenuUISystem), "IsEditorEnabled")]
-class MenuUISystem_IsEditorEnabledPatch
-{
-    static bool Prefix(ref bool __result)
-    {
-        __result = true;
-
-        return false; // Ignore original function
-    }
-}
-// Thanks to @89pleasure for the MenuUISystem_IsEditorEnabledPatch snippet above
-// https://github.com/89pleasure/cities2-mod-collection/blob/71385c000779c23b85e5cc023fd36022a06e9916/EditorEnabled/Patches/MenuUISystemPatches.cs
-
-*/

@@ -1,5 +1,4 @@
 using System.Runtime.CompilerServices;
-using Colossal.Mathematics;
 using Game.Common;
 using Game.Prefabs;
 using Game.Simulation;
@@ -57,6 +56,8 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
 
         [DeallocateOnJobCompletion]
         public TimeData m_TimeData;
+
+        public DemandParameterData m_DemandParameters;
 
         public TimeSettingsData m_TimeSettings;
 
@@ -153,9 +154,8 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
                 }
                 else if (citizen.m_BirthDay == 2)
                 {
-                    num2 = random.NextInt(AgingSystem_RealPop.GetAdultAgeLimitInDays());
                     float studyWillingness = citizen.GetPseudoRandom(CitizenPseudoRandom.StudyWillingness).NextFloat();
-                    if (num2 < AgingSystem_RealPop.GetTeenAgeLimitInDays())
+                    if (random.NextFloat(1f) > m_DemandParameters.m_TeenSpawnPercentage)
                     {
                         citizen.SetAge(CitizenAge.Child);
                         citizen.SetEducationLevel(0);
@@ -163,8 +163,8 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
                     else
                     {
                         citizen.SetAge(CitizenAge.Teen);
-                        float value = 1f - math.pow(1f - GraduationSystem_RealPop.GetGraduationProbability(1, 50, 0f, default(float2), default(float2), studyWillingness, 1f), 4f);
-                        int educationLevel = MathUtils.RoundToIntRandom(ref random, value);
+                        float num3 = math.pow(1f - GraduationSystem_RealPop.GetGraduationProbability(1, 75, 0f, default(float2), default(float2), studyWillingness, 1f), 4f);
+                        int educationLevel = ((!(random.NextFloat(1f) < num3)) ? 1 : 0);
                         citizen.SetEducationLevel(educationLevel);
                     }
                 }
@@ -217,22 +217,6 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
         }
     }
 
-    // Infixo: Job to dispose the allocated memory
-    private struct DisposeJob : IJob
-    {
-        public uint m_Frame;
-        public NativeArray<Entity> m_ToDispose1;
-        public NativeArray<Entity> m_ToDispose2;
-
-        public void Execute()
-        {
-            // Dispose of the NativeArray
-            m_ToDispose1.Dispose();
-            m_ToDispose2.Dispose();
-            Plugin.Log($"Disposed: from frame {m_Frame}");
-        }
-    }
-
     private EntityQuery m_Additions;
 
     private EntityQuery m_TimeSettingGroup;
@@ -240,6 +224,8 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
     private EntityQuery m_CitizenPrefabs;
 
     private EntityQuery m_TimeDataQuery;
+
+    private EntityQuery m_DemandParameterQuery;
 
     private SimulationSystem m_SimulationSystem;
 
@@ -260,9 +246,11 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
         m_CitizenPrefabs = GetEntityQuery(ComponentType.ReadOnly<CitizenData>());
         m_TimeSettingGroup = GetEntityQuery(ComponentType.ReadOnly<TimeSettingsData>());
         m_TimeDataQuery = GetEntityQuery(ComponentType.ReadOnly<TimeData>());
+        m_DemandParameterQuery = GetEntityQuery(ComponentType.ReadOnly<DemandParameterData>());
         RequireForUpdate(m_Additions);
         RequireForUpdate(m_TimeDataQuery);
         RequireForUpdate(m_TimeSettingGroup);
+        RequireForUpdate(m_DemandParameterQuery);
         Plugin.Logger.LogInfo("Modded CitizenInitializeSystem created.");
     }
 
@@ -287,6 +275,7 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
         initializeCitizenJob.m_MailSenders = __TypeHandle.__Game_Citizens_MailSender_RW_ComponentLookup;
         initializeCitizenJob.m_CrimeVictims = __TypeHandle.__Game_Citizens_CrimeVictim_RW_ComponentLookup;
         initializeCitizenJob.m_CitizenDatas = __TypeHandle.__Game_Prefabs_CitizenData_RO_ComponentLookup;
+        initializeCitizenJob.m_DemandParameters = m_DemandParameterQuery.GetSingleton<DemandParameterData>();
         initializeCitizenJob.m_TimeSettings = m_TimeSettingGroup.GetSingleton<TimeSettingsData>();
         initializeCitizenJob.m_TimeData = m_TimeDataQuery.GetSingleton<TimeData>();
         initializeCitizenJob.m_SimulationFrame = m_SimulationSystem.frameIndex;
@@ -296,13 +285,6 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
         InitializeCitizenJob jobData = initializeCitizenJob;
         //Plugin.Log($"AllocTemp: frame {m_SimulationSystem.frameIndex}");// entities {initializeCitizenJob.m_Entities.Length} citizens {initializeCitizenJob.m_CitizenPrefabs.Length}");
         base.Dependency = IJobExtensions.Schedule(jobData, JobHandle.CombineDependencies(base.Dependency, outJobHandle));
-        // Infixo: Dispose of the NativeArray when the job completes
-        //DisposeJob disposeJob = default(DisposeJob);
-        //disposeJob.m_Frame = initializeCitizenJob.m_SimulationFrame;
-        //disposeJob.m_ToDispose1 = initializeCitizenJob.m_Entities;
-        //disposeJob.m_ToDispose2 = initializeCitizenJob.m_CitizenPrefabs;
-        //DisposeJob jobData2 = disposeJob;
-        //base.Dependency = IJobExtensions.Schedule(jobData2, base.Dependency); //   new YourDisposeJob { YourNativeArray = yourNativeArray }.Schedule(jobHandle);
         m_EndFrameBarrier.AddJobHandleForProducer(base.Dependency);
     }
 

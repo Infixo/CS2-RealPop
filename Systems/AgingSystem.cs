@@ -17,7 +17,6 @@ using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine.Scripting;
-using BepInEx.Configuration;
 
 namespace RealPop.Systems;
 

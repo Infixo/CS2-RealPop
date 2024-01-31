@@ -62,6 +62,9 @@ public class ApplyToSchoolSystem_RealPop : GameSystemBase
         public ComponentLookup<TouristHousehold> m_TouristHouseholds;
 
         [ReadOnly]
+        public ComponentLookup<SchoolSeekerCooldown> m_SchoolSeekerCooldowns;
+
+        [ReadOnly]
         public RandomSeed m_RandomSeed;
 
         public uint m_UpdateFrameIndex;
@@ -93,7 +96,7 @@ public class ApplyToSchoolSystem_RealPop : GameSystemBase
             {
                 Citizen citizen = nativeArray2[i];
                 CitizenAge age = citizen.GetAge();
-                if (age == CitizenAge.Elderly)
+                if (age == CitizenAge.Elderly || (m_SchoolSeekerCooldowns.HasComponent(nativeArray[i]) && m_SimulationFrame < m_SchoolSeekerCooldowns[nativeArray[i]].m_SimulationFrame + kCoolDown))
                 {
                     continue;
                 }
@@ -157,6 +160,10 @@ public class ApplyToSchoolSystem_RealPop : GameSystemBase
                     //Plugin.Logger.LogInfo(logmsg + $" DENIED prob {enteringProbability}");
                     citizen.SetFailedEducationCount(math.min(3, failedEducationCount + 1));
                     nativeArray2[i] = citizen;
+                    m_CommandBuffer.AddComponent(unfilteredChunkIndex, nativeArray[i], new SchoolSeekerCooldown
+                    {
+                        m_SimulationFrame = m_SimulationFrame
+                    });
                 }
             }
         }
@@ -206,6 +213,9 @@ public class ApplyToSchoolSystem_RealPop : GameSystemBase
         [ReadOnly]
         public ComponentLookup<TouristHousehold> __Game_Citizens_TouristHousehold_RO_ComponentLookup;
 
+        [ReadOnly]
+        public ComponentLookup<SchoolSeekerCooldown> __Game_Citizens_SchoolSeekerCooldown_RO_ComponentLookup;
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void __AssignHandles(ref SystemState state)
         {
@@ -222,8 +232,11 @@ public class ApplyToSchoolSystem_RealPop : GameSystemBase
             __Game_Economy_Resources_RO_BufferLookup = state.GetBufferLookup<Resources>(isReadOnly: true);
             __Game_City_ServiceFee_RO_BufferLookup = state.GetBufferLookup<ServiceFee>(isReadOnly: true);
             __Game_Citizens_TouristHousehold_RO_ComponentLookup = state.GetComponentLookup<TouristHousehold>(isReadOnly: true);
+            __Game_Citizens_SchoolSeekerCooldown_RO_ComponentLookup = state.GetComponentLookup<SchoolSeekerCooldown>(isReadOnly: true);
         }
     }
+
+    public static readonly int kCoolDown = 20000;
 
     public const uint UPDATE_INTERVAL = 8192u;
 
@@ -280,6 +293,7 @@ public class ApplyToSchoolSystem_RealPop : GameSystemBase
     {
         uint updateFrameWithInterval = SimulationUtils.GetUpdateFrameWithInterval(m_SimulationSystem.frameIndex, (uint)GetUpdateInterval(SystemUpdatePhase.GameSimulation), 16);
         //RealPop.Debug.Log($"Updating interval {updateFrameWithInterval} frame {m_SimulationSystem.frameIndex}");
+        __TypeHandle.__Game_Citizens_SchoolSeekerCooldown_RO_ComponentLookup.Update(ref base.CheckedStateRef);
         __TypeHandle.__Game_Citizens_TouristHousehold_RO_ComponentLookup.Update(ref base.CheckedStateRef);
         __TypeHandle.__Game_City_ServiceFee_RO_BufferLookup.Update(ref base.CheckedStateRef);
         __TypeHandle.__Game_Economy_Resources_RO_BufferLookup.Update(ref base.CheckedStateRef);
@@ -307,6 +321,7 @@ public class ApplyToSchoolSystem_RealPop : GameSystemBase
         applyToSchoolJob.m_Resources = __TypeHandle.__Game_Economy_Resources_RO_BufferLookup;
         applyToSchoolJob.m_Fees = __TypeHandle.__Game_City_ServiceFee_RO_BufferLookup;
         applyToSchoolJob.m_TouristHouseholds = __TypeHandle.__Game_Citizens_TouristHousehold_RO_ComponentLookup;
+        applyToSchoolJob.m_SchoolSeekerCooldowns = __TypeHandle.__Game_Citizens_SchoolSeekerCooldown_RO_ComponentLookup;
         applyToSchoolJob.m_RandomSeed = RandomSeed.Next();
         applyToSchoolJob.m_SimulationFrame = m_SimulationSystem.frameIndex;
         applyToSchoolJob.m_EconomyParameters = __query_2069025488_0.GetSingleton<EconomyParameterData>();
@@ -334,7 +349,7 @@ public class ApplyToSchoolSystem_RealPop : GameSystemBase
         {
             return 0f;
         }
-        float num = (float)wellbeing / 100f * (0.5f + willingness);
+        float num = (float)wellbeing / 60f * (0.5f + willingness);
         switch (level)
         {
         case 2:
