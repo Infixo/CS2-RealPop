@@ -1,5 +1,11 @@
 # Population and Education Rebalance Mod
 The goal of this mod is to rebalance population structure and education needs, to be more realistic. It will reduce the number of Children and increase the number or Teens, thus balancing the needs for Elementary and High Schools.
+At the end you should see the changes in population structure and education groups ratios like this.
+
+![Population](https://raw.githubusercontent.com/infixo/cs2-realpop/main/docs/pop_change.png)
+
+![Education](https://raw.githubusercontent.com/infixo/cs2-realpop/main/docs/edu_change.png)
+
 
 ## Features
 
@@ -22,9 +28,10 @@ The goal of this mod is to rebalance population structure and education needs, t
 ## Technical
 
 ### Requirements and Compatibility
-- Cities Skylines II version 1.0.15f1
-- BepInEx 5
-- Cim Behavior Improvements mod is not compatible (both modify ApplyToSchoolSystem).
+- Cities Skylines II version 1.0.19f1 or later; check GitHub or Discord if the mod is compatible with the latest game version.
+- BepInEx 5.
+- Modified systems: AgingSystem, ApplyToSchoolSystem, CitizenInitializeSystem, GraduationSystem, SchoolAISystem.
+- Cim Behavior Improvements is not compatible (both modify ApplyToSchoolSystem).
 
 ### Installation
 1. Place the `RealPopMod.dll` file in your BepInEx `Plugins` folder.
@@ -34,6 +41,8 @@ The goal of this mod is to rebalance population structure and education needs, t
 - Nothing atm.
 
 ### Changelog
+- v0.4.0 (2024-01-31)
+  - Compatibility with patch 1.0.19f1
 - v0.3.0 (2023-12-07)
   - Graduation logic revamped.
   - 2 fixes for ApplyToSchool system.
@@ -47,9 +56,12 @@ The goal of this mod is to rebalance population structure and education needs, t
 
 ### Support
 - Please report bugs and issues on [GitHub](https://github.com/Infixo/CS2-RealPop).
-- You may also leave comments on [Discord](https://discord.com/channels/1169011184557637825/1181630312338444398).
+- You may also leave comments on [Discord1](https://discord.com/channels/1169011184557637825/1198628199207292929) or [Discord2](https://discord.com/channels/1024242828114673724/1183857600098480237).
 
 ## Disclaimers and Notes
+> [!Credits]
+The mod uses Cities: Skylines 2 Mod Template by Captain-Of-Coit.
+
 > [!IMPORTANT]
 It will take one full in-game day for the population to adjust to the new thresholds. Education changes need more time, at least 3-5 days. You may wanna build a few extra High Schools until the levels will adjust.
 
@@ -57,8 +69,8 @@ It will take one full in-game day for the population to adjust to the new thresh
 Cims cannot go back to the previous phase of their lives, so changes done by this mod are irreversible. Make sure to have a savefile. Once the mod is deactivated, cims will follow default logic, so eventually the city will return to the vanilla state, but it will take several in-game days.
 
 > [!NOTE]
-> The graduation logic implemented in the game is flawed, imho. Most students stay in schools for 1-2 days usually. The average time shown in the UI is totally incorrect (on many levels, both calculations and UI presentation).
+The graduation logic implemented in the game is flawed, imho. Most students stay in schools for 1-2 days usually. The average time shown in the UI is totally incorrect (on many levels, both calculations and UI presentation).
 
 > [!NOTE]
-> The timeline in CS2 is measured in days. Each in-game day also represents 1 month (e.g. when looking at average time spent in schools) but also can be treated as 1 year of cim life, which is much more reasonable than using months. Cims live around 100 days, give or take few, so it is pretty close to average fuman lifespan (80+ years).
-> The population structure is based on EU statistics data, population by age. 0-14 years is ~15%, which we can consider Children in CS2 reality. 15-24 years is 11%, which we can consider Teens. And 65+ years is 21%, which we can consider Seniors (65 is usual retirement age in EU). The rest are Adults.
+The timeline in CS2 is measured in days. Each in-game day also represents 1 month (e.g. when looking at average time spent in schools) but also can be treated as 1 year of cim life, which is much more reasonable than using months. Cims live around 100 days, give or take few, so it is pretty close to average fuman lifespan (80+ years).
+The population structure is based on EU statistics data, population by age. 0-14 years is ~15%, which we can consider Children in CS2 reality. 15-24 years is 11%, which we can consider Teens. And 65+ years is 21%, which we can consider Seniors (65 is usual retirement age in EU). The rest are Adults.
