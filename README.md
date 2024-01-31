@@ -2,9 +2,9 @@
 The goal of this mod is to rebalance population structure and education needs, to be more realistic. It will reduce the number of Children and increase the number or Teens, thus balancing the needs for Elementary and High Schools.
 At the end you should see the changes in population structure and education groups ratios like this.
 
-![Population](https://raw.githubusercontent.com/infixo/cs2-realpop/main/docs/pop_change.png)
+![Population](https://raw.githubusercontent.com/infixo/cs2-realpop/master/docs/pop_change.png)
 
-![Education](https://raw.githubusercontent.com/infixo/cs2-realpop/main/docs/edu_change.png)
+![Education](https://raw.githubusercontent.com/infixo/cs2-realpop/master/docs/edu_change.png)
 
 
 ## Features
