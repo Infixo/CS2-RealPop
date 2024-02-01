@@ -1,6 +1,8 @@
 using Game;
+using Game.Prefabs;
 using HarmonyLib;
 using RealPop.Systems;
+using System.Security.Cryptography;
 using UnityEngine;
 
 namespace RealPop.Patches;
@@ -80,4 +82,18 @@ class RealPopPatches
         return false; // don't execute the original
     }
 #endif
+
+    [HarmonyPatch(typeof(Game.Prefabs.PrefabSystem), "AddPrefab")]
+    [HarmonyPrefix]
+    public static bool PrefabSystem_AddPrefab_Prefix(PrefabBase prefab)
+    {
+        if (prefab.name == "CoupleHousehold")
+        {
+            HouseholdPrefab comp = prefab.GetComponent<HouseholdPrefab>();
+            //comp.m_Weight = 0;
+            comp.m_AdultCount = 2; // vanilla prefab has 1 Adult for CoupleHousehold
+            Plugin.Log($"Patched {prefab.name} for AdultCount={comp.m_AdultCount}");
+        }
+        return true;
+    }
 }

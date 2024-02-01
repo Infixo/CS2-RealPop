@@ -12,6 +12,7 @@ using Unity.Mathematics;
 using UnityEngine.Scripting;
 using Game;
 using Game.Citizens;
+using static Unity.Burst.Intrinsics.X86.Avx;
 
 namespace RealPop.Systems;
 
@@ -104,7 +105,9 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
                 {
                     m_Citizen = entity
                 });
+                // Infixo: num2 is an actual age that will be used to replace m_BirthDay at the end
                 int num2 = 0;
+                int citClass = citizen.m_BirthDay; // debug
                 if (citizen.m_BirthDay == 0)
                 {
                     citizen.SetAge(CitizenAge.Child);
@@ -139,8 +142,12 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
                 }
                 else if (citizen.m_BirthDay == 1)
                 {
+                    // Infixo: these are ADULTS in households
                     int adultAgeLimitInDays = AgingSystem_RealPop.GetAdultAgeLimitInDays();
-                    num2 = adultAgeLimitInDays + random.NextInt(AgingSystem_RealPop.GetElderAgeLimitInDays() - adultAgeLimitInDays);
+                    if (s_NoChildrenWhenTooOld) // modded
+                        num2 = random.NextInt(adultAgeLimitInDays, AgingSystem_RealPop.GetElderAgeLimitInDays() - adultAgeLimitInDays);
+                    else // vanilla
+                        num2 = adultAgeLimitInDays + random.NextInt(AgingSystem_RealPop.GetElderAgeLimitInDays() - adultAgeLimitInDays);
                     citizen.SetAge(CitizenAge.Adult);
                     citizen.m_State |= CitizenFlags.NeedsNewJob;
                     if (flag)
@@ -149,39 +156,71 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
                     }
                     else
                     {
-                        citizen.SetEducationLevel((random.NextInt(5) + 1) / 2);
+                        // non-commuters
+                        if (s_NewAdultsAnyEducation) // modded
+                            citizen.SetEducationLevel((random.NextInt(8) + 1) / 2);
+                        else // vanilla behavior, 20% 0, 40% 1, 40% 1
+                            citizen.SetEducationLevel((random.NextInt(5) + 1) / 2);
                     }
                 }
                 else if (citizen.m_BirthDay == 2)
                 {
+                    // Infixo: these are CHILDREN in households
                     float studyWillingness = citizen.GetPseudoRandom(CitizenPseudoRandom.StudyWillingness).NextFloat();
                     if (random.NextFloat(1f) > m_DemandParameters.m_TeenSpawnPercentage)
                     {
+                        // Infixo: spawn CHILD
+                        num2 = random.NextInt(1, AgingSystem_RealPop.GetTeenAgeLimitInDays()); // exclude 0, as these are newborns that are handled differently
                         citizen.SetAge(CitizenAge.Child);
                         citizen.SetEducationLevel(0);
                     }
                     else
                     {
+                        // Infixo: spawn TEEN
                         citizen.SetAge(CitizenAge.Teen);
+                        // num3 is grad probability from elementary school
                         float num3 = math.pow(1f - GraduationSystem_RealPop.GetGraduationProbability(1, 75, 0f, default(float2), default(float2), studyWillingness, 1f), 4f);
                         int educationLevel = ((!(random.NextFloat(1f) < num3)) ? 1 : 0);
                         citizen.SetEducationLevel(educationLevel);
+                        if (educationLevel == 1) // finished elementary, ready for high school, could even start it so we will accrue some random years from the high school
+                            num2 = AgingSystem_RealPop.GetTeenAgeLimitInDays() + random.NextInt(s_Education2InDays);
+                        else // no elementary, it will always be Uneducated, so age can be anything
+                            num2 = random.NextInt(AgingSystem_RealPop.GetTeenAgeLimitInDays(), AgingSystem_RealPop.GetAdultAgeLimitInDays());
                     }
                 }
                 else if (citizen.m_BirthDay == 3)
                 {
+                    // Infixo: these are ELDERS in households
                     num2 = AgingSystem_RealPop.GetElderAgeLimitInDays() + random.NextInt(3 * daysPerYear);
                     citizen.SetAge(CitizenAge.Elderly);
-                    citizen.SetEducationLevel(random.NextInt(3));
+                    if (s_NewAdultsAnyEducation)
+                        citizen.SetEducationLevel(random.NextInt(5));
+                    else // vanilla behavior, even spread
+                        citizen.SetEducationLevel(random.NextInt(3));
                 }
                 else
                 {
-                    num2 = 3 * daysPerYear + random.NextInt(daysPerYear);
-                    citizen.SetAge(CitizenAge.Adult);
-                    citizen.SetEducationLevel(random.NextInt(1) + 2);
+                    // Infixo: these are STUDENTS in households
+                    if (s_AllowTeenStudents) // modded
+                    {
+                        int educationLevel = ( random.NextInt(100) < 50 ? 2 : 3 ); // decide if going for College or University, it is hardcoded 50% now
+                        citizen.SetEducationLevel(educationLevel);
+                        if (educationLevel == 2) // Teen for College
+                            num2 = AgingSystem_RealPop.GetAdultAgeLimitInDays() - s_Education3InDays - 1;
+                        else // Adult for University
+                            num2 = AgingSystem_RealPop.GetAdultAgeLimitInDays();
+                    }
+                    else // vanilla
+                    {
+                        //num2 = 3 * daysPerYear + random.NextInt(daysPerYear);
+                        num2 = AgingSystem_RealPop.GetAdultAgeLimitInDays() + random.NextInt(daysPerYear);
+                        citizen.SetAge(CitizenAge.Adult);
+                        citizen.SetEducationLevel(random.NextInt(1) + 2);
+                    }
                 }
                 citizen.m_BirthDay = (short)(TimeSystem.GetDay(m_SimulationFrame, m_TimeData) - num2);
                 m_Citizens[entity] = citizen;
+                Plugin.Log($"Citizen{citClass}: {num2} {citizen.GetAge()} {citizen.GetEducationLevel()}");
             }
             //Plugin.Log($"InitializeCitizenJob: frame {m_SimulationFrame} finished");
         }
@@ -235,6 +274,13 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
 
     private TypeHandle __TypeHandle;
 
+    // config values
+    private static bool s_NewAdultsAnyEducation;
+    private static bool s_NoChildrenWhenTooOld;
+    private static bool s_AllowTeenStudents;
+    private static int s_Education2InDays;
+    private static int s_Education3InDays;
+
     [Preserve]
     protected override void OnCreate()
     {
@@ -251,7 +297,13 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
         RequireForUpdate(m_TimeDataQuery);
         RequireForUpdate(m_TimeSettingGroup);
         RequireForUpdate(m_DemandParameterQuery);
-        Plugin.Logger.LogInfo("Modded CitizenInitializeSystem created.");
+        // Infixo
+        s_NewAdultsAnyEducation = Plugin.NewAdultsAnyEducation.Value;
+        s_NoChildrenWhenTooOld = Plugin.NoChildrenWhenTooOld.Value;
+        s_AllowTeenStudents = Plugin.AllowTeenStudents.Value;
+        s_Education2InDays = Plugin.Education2InDays.Value;
+        s_Education3InDays = Plugin.Education3InDays.Value;
+        Plugin.Log($"Modded CitizenInitializeSystem created. NewAdultsAnyEducation={s_NewAdultsAnyEducation}, NoChildrenWhenTooOld={s_NoChildrenWhenTooOld}, AllowTeenStudents={s_AllowTeenStudents}");
     }
 
     [Preserve]
