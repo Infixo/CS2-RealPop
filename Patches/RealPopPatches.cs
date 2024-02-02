@@ -94,6 +94,19 @@ class RealPopPatches
             comp.m_AdultCount = 2; // vanilla prefab has 1 Adult for CoupleHousehold
             Plugin.Log($"Patched {prefab.name} for AdultCount={comp.m_AdultCount}");
         }
+        else if (prefab.name == "CoupleHousehold2") // family 2+2
+        {
+            HouseholdPrefab comp = prefab.GetComponent<HouseholdPrefab>();
+            comp.m_Weight = 5; // vanilla = 1
+            Plugin.Log($"Patched {prefab.name} for Weight={comp.m_Weight}");
+        }
+        else if (prefab.name == "CoupleHousehold5") // 5 children!!! - will be family 2+1
+        {
+            HouseholdPrefab comp = prefab.GetComponent<HouseholdPrefab>();
+            comp.m_Weight = 7;
+            comp.m_ChildCount = 1; // vanilla is missing classic 2+1 family
+            Plugin.Log($"Patched {prefab.name} for ChildCount={comp.m_ChildCount} and Weight={comp.m_Weight}");
+        }
         return true;
     }
 }

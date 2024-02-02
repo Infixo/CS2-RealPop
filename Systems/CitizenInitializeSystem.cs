@@ -220,7 +220,7 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
                 }
                 citizen.m_BirthDay = (short)(TimeSystem.GetDay(m_SimulationFrame, m_TimeData) - num2);
                 m_Citizens[entity] = citizen;
-                Plugin.Log($"Citizen{citClass}: {num2} {citizen.GetAge()} {citizen.GetEducationLevel()}");
+                //Plugin.Log($"Citizen{citClass}: {num2} {citizen.GetAge()} {citizen.GetEducationLevel()}");
             }
             //Plugin.Log($"InitializeCitizenJob: frame {m_SimulationFrame} finished");
         }
