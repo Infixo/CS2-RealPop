@@ -2,8 +2,6 @@ using Game;
 using Game.Prefabs;
 using HarmonyLib;
 using RealPop.Systems;
-using System.Security.Cryptography;
-using UnityEngine;
 
 namespace RealPop.Patches;
 
@@ -16,6 +14,7 @@ class RealPopPatches
     {
         updateSystem.UpdateAt<AgingSystem_RealPop>(SystemUpdatePhase.GameSimulation);
         updateSystem.UpdateAt<ApplyToSchoolSystem_RealPop>(SystemUpdatePhase.GameSimulation);
+        updateSystem.UpdateAt<BirthSystem_RealPop>(SystemUpdatePhase.GameSimulation);
         updateSystem.UpdateAt<GraduationSystem_RealPop>(SystemUpdatePhase.GameSimulation);
         updateSystem.UpdateAt<SchoolAISystem_RealPop>(SystemUpdatePhase.GameSimulation);
         updateSystem.UpdateAt<CitizenInitializeSystem_RealPop>(SystemUpdatePhase.Modification5);
@@ -34,17 +33,20 @@ class RealPopPatches
     [HarmonyPrefix]
     static bool ApplyToSchoolSystem_OnUpdate(Game.Simulation.ApplyToSchoolSystem __instance)
     {
-        //RealPop.Debug.Log("original system disabled");
-        //__instance.World.GetOrCreateSystemManaged<RealPop.Systems.ApplyToSchoolSystem_RealPop>().Update();
         return false; // don't execute the original system
-    }    
+    }
+
+    [HarmonyPatch(typeof(Game.Simulation.BirthSystem), "OnUpdate")]
+    [HarmonyPrefix]
+    static bool BirthSystem_OnUpdate(Game.Simulation.BirthSystem __instance)
+    {
+        return false; // don't execute the original system
+    }
 
     [HarmonyPatch(typeof(Game.Simulation.GraduationSystem), "OnUpdate")]
     [HarmonyPrefix]
     static bool GraduationSystem_OnUpdate(Game.Simulation.GraduationSystem __instance)
     {
-        //RealPop.Debug.Log("Original GraduationSystem disabled.");
-        //__instance.World.GetOrCreateSystemManaged<RealPop.Systems.GraduationSystem_RealPop>().Update();
         return false; // don't execute the original system
     }
 

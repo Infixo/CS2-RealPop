@@ -17,11 +17,13 @@ using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine.Scripting;
+using Game;
+using Game.Simulation;
 
-namespace Game.Simulation;
+namespace RealPop.Systems;
 
 [CompilerGenerated]
-public class BirthSystem : GameSystemBase
+public class BirthSystem_RealPop : GameSystemBase
 {
     [BurstCompile]
     private struct CheckBirthJob : IJobChunk
@@ -69,6 +71,10 @@ public class BirthSystem : GameSystemBase
 
         public NativeQueue<StatisticsEvent>.ParallelWriter m_StatisticsEventQueue;
 
+        // RealPop
+        public uint m_SimulationFrame;
+        public TimeData m_TimeData;
+
         private Entity SpawnBaby(int index, Entity household, ref Random random, Entity building)
         {
             m_DebugBirthCounter.Increment();
@@ -105,6 +111,8 @@ public class BirthSystem : GameSystemBase
             NativeArray<Citizen> nativeArray2 = chunk.GetNativeArray(ref m_CitizenType);
             NativeArray<HouseholdMember> nativeArray3 = chunk.GetNativeArray(ref m_MemberType);
             Random random = m_RandomSeed.GetRandom(unfilteredChunkIndex);
+            int day = TimeSystem.GetDay(m_SimulationFrame, m_TimeData);
+            int birthMaxAge = AgingSystem_RealPop.GetElderAgeLimitInDays() - AgingSystem_RealPop.GetAdultAgeLimitInDays();
             for (int i = 0; i < nativeArray.Length; i++)
             {
                 Entity entity = nativeArray[i];
@@ -113,6 +121,14 @@ public class BirthSystem : GameSystemBase
                 {
                     continue;
                 }
+                // RealPop: find the real age here
+                int ageInDays = day - citizen.m_BirthDay;
+                if (s_NoChildrenWhenTooOld && ageInDays > birthMaxAge)
+                {
+                    //Plugin.Log($"SKIP citizen aged {ageInDays} (max is {birthMaxAge})");
+                    continue;
+                }
+                // Check if they have a home
                 Entity household = nativeArray3[i].m_Household;
                 Entity entity2 = Entity.Null;
                 if (m_PropertyRenters.HasComponent(household))
@@ -123,25 +139,38 @@ public class BirthSystem : GameSystemBase
                 {
                     continue;
                 }
+                // Analyze family
                 DynamicBuffer<HouseholdCitizen> dynamicBuffer = m_HouseholdCitizens[household];
-                int num = m_BirthChance;
-                Entity @null = Entity.Null;
+                int num = s_BirthChanceSingle;
+                Entity @null = Entity.Null; // the father
+                int numChildren = 0;
+                //bool isFamily = false; // debug
                 for (int j = 0; j < dynamicBuffer.Length; j++)
                 {
                     @null = dynamicBuffer[j].m_Citizen;
                     if (m_Citizens.HasComponent(@null))
                     {
                         Citizen citizen2 = m_Citizens[@null];
+                        // increase birth chance if there is a male Adult
                         if ((citizen2.m_State & CitizenFlags.Male) != 0 && citizen2.GetAge() == CitizenAge.Adult)
                         {
-                            num += 80;
-                            break;
+                            num = s_BirthChanceFamily;
+                            //break; // RealPop - don't break, must count children
+                            //isFamily = true; // debug
                         }
+                        // Count children
+                        if (citizen2.GetAge() == CitizenAge.Child || citizen2.GetAge() == CitizenAge.Teen)
+                            numChildren++;
                     }
                 }
-                if (m_Students.HasComponent(entity))
+                // Adjust the chance of birth for each consecutive child
+                num = (int)math.round((float)num*math.pow((float)s_NextBirthChance/100f, (float)numChildren));
+                // RealPop: check also if the father is a student!
+                //bool isStudent = false; // debug
+                if (m_Students.HasComponent(entity) || m_Students.HasComponent(@null))
                 {
                     num /= 2;
+                    //isStudent = true; // debug
                 }
                 if (random.NextInt(1000 * kUpdatesPerDay) < num)
                 {
@@ -151,6 +180,7 @@ public class BirthSystem : GameSystemBase
                         m_Statistic = StatisticType.BirthRate,
                         m_Change = 1f
                     });
+                    //Plugin.Log($"BABY: chance {num} age {ageInDays} family {isFamily} children {numChildren} student {isStudent}");
                 }
             }
         }
@@ -236,6 +266,13 @@ public class BirthSystem : GameSystemBase
 
     private TypeHandle __TypeHandle;
 
+    // RealPop
+    private EntityQuery m_TimeDataQuery;
+    private static bool s_NoChildrenWhenTooOld;
+    private static int s_BirthChanceSingle;
+    private static int s_BirthChanceFamily;
+    private static int s_NextBirthChance;
+
     public override int GetUpdateInterval(SystemUpdatePhase phase)
     {
         return 262144 / (kUpdatesPerDay * 16);
@@ -255,6 +292,15 @@ public class BirthSystem : GameSystemBase
         m_CitizenPrefabQuery = GetEntityQuery(ComponentType.ReadOnly<CitizenData>(), ComponentType.ReadOnly<ArchetypeData>());
         RequireForUpdate(m_CitizenPrefabQuery);
         RequireForUpdate(m_CitizenQuery);
+        // RealPop
+        m_TimeDataQuery = GetEntityQuery(ComponentType.ReadOnly<TimeData>());
+        s_NoChildrenWhenTooOld = Plugin.NoChildrenWhenTooOld.Value;
+        // rescale birth chance if NoChildrenWhenTooOld is OFF - more time to give birth, so chance is cut down
+        int ratio = s_NoChildrenWhenTooOld ? 100 : 100*(AgingSystem_RealPop.GetElderAgeLimitInDays() - 2 * AgingSystem_RealPop.GetAdultAgeLimitInDays()) / (AgingSystem_RealPop.GetElderAgeLimitInDays() - AgingSystem_RealPop.GetAdultAgeLimitInDays());
+        s_BirthChanceSingle = Plugin.BirthChanceSingle.Value * ratio / 100;
+        s_BirthChanceFamily = Plugin.BirthChanceFamily.Value * ratio / 100;
+        s_NextBirthChance = Plugin.NextBirthChance.Value;
+        Plugin.Log($"Modded BirthSystem created. BirthChances={s_BirthChanceSingle}/{s_BirthChanceFamily}, NextBirthChance={s_NextBirthChance}, NoChildrenWhenTooOld={s_NoChildrenWhenTooOld} (ratio {ratio}).");
     }
 
     [Preserve]
@@ -294,6 +340,8 @@ public class BirthSystem : GameSystemBase
         checkBirthJob.m_UpdateFrameIndex = updateFrame;
         checkBirthJob.m_CommandBuffer = m_EndFrameBarrier.CreateCommandBuffer().AsParallelWriter();
         checkBirthJob.m_StatisticsEventQueue = m_CityStatisticsSystem.GetStatisticsEventQueue(out var deps).AsParallelWriter();
+        checkBirthJob.m_SimulationFrame = m_SimulationSystem.frameIndex; // RealPop
+        checkBirthJob.m_TimeData = m_TimeDataQuery.GetSingleton<TimeData>(); // RealPop
         CheckBirthJob jobData = checkBirthJob;
         base.Dependency = JobChunkExtensions.ScheduleParallel(jobData, m_CitizenQuery, JobUtils.CombineDependencies(base.Dependency, deps, outJobHandle2, outJobHandle));
         m_EndFrameBarrier.AddJobHandleForProducer(base.Dependency);
@@ -319,7 +367,7 @@ public class BirthSystem : GameSystemBase
     }
 
     [Preserve]
-    public BirthSystem()
+    public BirthSystem_RealPop()
     {
     }
 }
