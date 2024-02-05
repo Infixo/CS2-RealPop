@@ -285,7 +285,7 @@ public class ApplyToSchoolSystem_RealPop : GameSystemBase
         RequireForUpdate(m_CitizenGroup);
         RequireForUpdate<EconomyParameterData>();
         RequireForUpdate<TimeData>();
-        Plugin.Logger.LogInfo("Modded ApplyToSchoolSystem created.");
+        Plugin.Log("Modded ApplyToSchoolSystem created.");
     }
 
     [Preserve]

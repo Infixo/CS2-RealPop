@@ -278,7 +278,7 @@ public class SchoolAISystem_RealPop : GameSystemBase
         RequireForUpdate<EconomyParameterData>();
         RequireForUpdate<EducationParameterData>();
         RequireForUpdate<TimeData>();
-        Plugin.Logger.LogInfo("Modded SchoolAISystem created.");
+        Plugin.Log("Modded SchoolAISystem created.");
     }
 
     [Preserve]

@@ -386,7 +386,7 @@ public class GraduationSystem_RealPop : GameSystemBase
         RequireForUpdate(m_StudentQuery);
         RequireForUpdate<EconomyParameterData>();
         RequireForUpdate<TimeData>();
-        // Infixo
+        // RealPop
         s_Education2InDays = Plugin.Education2InDays.Value;
         s_Education3InDays = Plugin.Education3InDays.Value;
         s_Education4InDays = Plugin.Education4InDays.Value;
@@ -394,7 +394,7 @@ public class GraduationSystem_RealPop : GameSystemBase
         s_GraduationLevel2 = Plugin.GraduationLevel2.Value;
         s_GraduationLevel3 = Plugin.GraduationLevel3.Value;
         s_GraduationLevel4 = Plugin.GraduationLevel4.Value;
-        Plugin.Logger.LogInfo($"Modded GraduationSystem created. School days: {s_Education2InDays}, {s_Education3InDays}, {s_Education4InDays}. Graduation params: {s_GraduationLevel1}, {s_GraduationLevel2}, {s_GraduationLevel3}, {s_GraduationLevel4}");
+        Plugin.Log($"Modded GraduationSystem created. School days: {s_Education2InDays}, {s_Education3InDays}, {s_Education4InDays}. Graduation params: {s_GraduationLevel1}, {s_GraduationLevel2}, {s_GraduationLevel3}, {s_GraduationLevel4}");
     }
 
     [Preserve]

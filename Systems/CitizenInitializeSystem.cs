@@ -297,7 +297,7 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
         RequireForUpdate(m_TimeDataQuery);
         RequireForUpdate(m_TimeSettingGroup);
         RequireForUpdate(m_DemandParameterQuery);
-        // Infixo
+        // RealPop
         s_NewAdultsAnyEducation = Plugin.NewAdultsAnyEducation.Value;
         s_NoChildrenWhenTooOld = Plugin.NoChildrenWhenTooOld.Value;
         s_AllowTeenStudents = Plugin.AllowTeenStudents.Value;

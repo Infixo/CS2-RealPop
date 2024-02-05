@@ -350,12 +350,11 @@ public class AgingSystem_RealPop : GameSystemBase
         m_BecomeAdultCounter = new NativeCounter(Allocator.Persistent);
         m_BecomeElderCounter = new NativeCounter(Allocator.Persistent);
         RequireForUpdate(m_CitizenGroup);
-        // Infixo
+        // RealPop
         s_TeenAgeLimitInDays = Plugin.TeenAgeLimitInDays.Value;
         s_AdultAgeLimitInDays = Plugin.AdultAgeLimitInDays.Value;
         s_ElderAgeLimitInDays = Plugin.ElderAgeLimitInDays.Value;
-        //RealPop.Debug.Log("Modded AgingSystem created.");
-        Plugin.Logger.LogInfo($"Modded AgingSystem created. Age thresholds: {s_TeenAgeLimitInDays}, {s_AdultAgeLimitInDays}, {s_ElderAgeLimitInDays}.");
+        Plugin.Log($"Modded AgingSystem created. Age thresholds: {s_TeenAgeLimitInDays}, {s_AdultAgeLimitInDays}, {s_ElderAgeLimitInDays}.");
     }
 
     [Preserve]

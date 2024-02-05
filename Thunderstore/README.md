@@ -1,10 +1,7 @@
 # Population and Education Rebalance Mod
 The goal of this mod is to rebalance population structure and education needs, to be more realistic. It will reduce the number of Children and increase the number or Teens, thus balancing the needs for Elementary and High Schools.
-At the end you should see the changes in population structure and education groups ratios like this.
 
-![Population](https://raw.githubusercontent.com/infixo/cs2-realpop/master/docs/pop_change.png)
-
-![Education](https://raw.githubusercontent.com/infixo/cs2-realpop/master/docs/edu_change.png)
+Version 0.5 introduces lots of fixes and changes to Birth and New Households processes. Please read the description. You may configure most of them or even turned off, if you like so.
 
 
 ## Features
@@ -12,6 +9,10 @@ At the end you should see the changes in population structure and education grou
 ### Lifecycle adjustments
   - Default thresholds for licycle stages are changed from 21/36/84 to 12/21/75. As a result, population structure should be more realistic i.e. 15% Children, 10% Teens, 60% Adults and 15% Seniors. These are approximate numbers ofc, may differ in your cities.
   - The thresholds can be individually set in the config file.
+  - At the end you should see the changes in population structure like this.
+
+![Population](https://raw.githubusercontent.com/infixo/cs2-realpop/master/docs/pop_change.png)
+  
 ### Graduation logic
   - Graduation process is more restrictive. Cims following typical education path will spend more time in High School, College and University. In Vanilla game they usually graduated after 1-2 days, rarely more. With this mod, they will spend a minimum number of days which is defined in the config file.
   - By default: 3 days/years in High School, 4 days/years in College and 5 days/years in University.
@@ -22,16 +23,37 @@ At the end you should see the changes in population structure and education grou
 ### Fixes for ApplyToSchool logic
   - Teens will no longer go to University.
   - College cannot be skipped. Vanilla game allows for direct jump from High School to University, even for Teens (famous genius Teens).
+  - At the end you should see the changes in education groups ratios like this.
+  
+![Education](https://raw.githubusercontent.com/infixo/cs2-realpop/master/docs/edu_change.png)
+  
+### New households
+  - Fixes CoupleHousehold having only 1 Adult. This bug is the main reason why so many singles move into the city. The mod makes CoupleHousehold as having 2 Adults.
+  - Since there is no typical 2+1 family defined (sic!), the mod changes 2+5 family into 2+1 family. Also boosts a bit chances of 2+2 families. This further improves the structure of incoming families.
+  - Fixes the bug where Children and Teens, all are spawned with age 0.
+  - Fixes the bug where all StudentHousehold are single Adults at fixed age 36.
+  - Allows for Adults to be at any education level. This can be turned on/off in the config file, option NewAdultsAnyEducation.
+  - Allows for Teens to be spawned as StudentHousehold. They are College-ready. This can be turned on/off in the config file, option AllowTeenStudents.
+  
+### Birth process  
+  - Adults cannot have children if they won't be able to raise them before becoming Seniors. This should prevent from having families like 1 Senior with 2 Children, that usually trigger High Rent warning. This can be turned on/off in the config file, option NoChildrenWhenTooOld.
+  - Introduces configurable params to control birth process, BirthChanceSingle, BirthChanceFamily and NextBirthChance. You can define a base chance to have a baby for a single mother, a family and decrease in chance with each consecutive baby.
+  - The chance of having a baby is halved also when a father is a student.
+  - The below picture shows Vanilla and modded distribution of families in the game. The vanilla curve is rather flat and symmetrical, produces on average 3.8 children in a family and allows for huge families like 6+ children. Modded curve is tilted towards lower number of children and chances of getting bigger families drop with every new child. On average, it results in 2.3 children per family.
+  - Please note that as a result of all the above changes, the birth rate will be lower that in the vanilla game, at approx. 2/3.
+
+![Children](https://raw.githubusercontent.com/infixo/cs2-realpop/master/docs/children.png)
+
 ### Planned Features
-- Waiting to see what CO will do about this topic.
+- Tweaks to LeaveHome and Death processes.
 
 ## Technical
 
 ### Requirements and Compatibility
 - Cities Skylines II version 1.0.19f1 or later; check GitHub or Discord if the mod is compatible with the latest game version.
 - BepInEx 5.
-- Modified systems: AgingSystem, ApplyToSchoolSystem, CitizenInitializeSystem, GraduationSystem, SchoolAISystem.
-- Cim Behavior Improvements is not compatible (both modify ApplyToSchoolSystem).
+- Modified systems: AgingSystem, ApplyToSchoolSystem, BirthSystem, CitizenInitializeSystem, GraduationSystem, SchoolAISystem.
+- Cim Behavior Improvements is not compatible (both modify ApplyToSchoolSystem and BirthSystem).
 
 ### Installation
 1. Place the `RealPopMod.dll` file in your BepInEx `Plugins` folder.
@@ -41,6 +63,8 @@ At the end you should see the changes in population structure and education grou
 - Nothing atm.
 
 ### Changelog
+- v0.5.0 (2024-02-05)
+  - Fixes and tweaks to Birth process and New households.
 - v0.4.0 (2024-01-31)
   - Compatibility with patch 1.0.19f1
 - v0.3.0 (2023-12-07)
