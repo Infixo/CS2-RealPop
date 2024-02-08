@@ -167,7 +167,7 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
                 {
                     // Infixo: these are CHILDREN in households
                     float studyWillingness = citizen.GetPseudoRandom(CitizenPseudoRandom.StudyWillingness).NextFloat();
-                    if (random.NextFloat(1f) > m_DemandParameters.m_TeenSpawnPercentage)
+                    if (random.NextFloat(1f) > s_TeenSpawnPercentage)
                     {
                         // Infixo: spawn CHILD
                         num2 = random.NextInt(1, AgingSystem_RealPop.GetTeenAgeLimitInDays()); // exclude 0, as these are newborns that are handled differently
@@ -280,6 +280,7 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
     private static bool s_AllowTeenStudents;
     private static int s_Education2InDays;
     private static int s_Education3InDays;
+    private static float s_TeenSpawnPercentage;
 
     [Preserve]
     protected override void OnCreate()
@@ -303,7 +304,9 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
         s_AllowTeenStudents = Plugin.AllowTeenStudents.Value;
         s_Education2InDays = Plugin.Education2InDays.Value;
         s_Education3InDays = Plugin.Education3InDays.Value;
-        Plugin.Log($"Modded CitizenInitializeSystem created. NewAdultsAnyEducation={s_NewAdultsAnyEducation}, NoChildrenWhenTooOld={s_NoChildrenWhenTooOld}, AllowTeenStudents={s_AllowTeenStudents}");
+        int teenAge = AgingSystem_RealPop.GetTeenAgeLimitInDays();
+        s_TeenSpawnPercentage = 1f - (float)teenAge / (float)(teenAge + s_Education2InDays);
+        Plugin.Log($"Modded CitizenInitializeSystem created. NewAdultsAnyEducation={s_NewAdultsAnyEducation}, NoChildrenWhenTooOld={s_NoChildrenWhenTooOld}, AllowTeenStudents={s_AllowTeenStudents}, TeenSpawnPercentage={100f*s_TeenSpawnPercentage:F0}");
     }
 
     [Preserve]
