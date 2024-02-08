@@ -286,7 +286,7 @@ public class CountHomesSystem : GameSystemBase
         m_FreeProperties = new NativeValue<int>(Allocator.Persistent);
         m_TotalProperties.value = -1;
         m_FreeProperties.value = -1;
-        Plugin.Log("CountHomesSystem created.");
+        Plugin.Log($"CountHomesSystem created. FreeRatioTreshold={Plugin.FreeRatioTreshold.Value}.");
     }
 
     [Preserve]

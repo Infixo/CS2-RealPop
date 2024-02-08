@@ -65,6 +65,7 @@ public class Plugin : BaseUnityPlugin
     public static ConfigEntry<int> BirthChanceSingle;
     public static ConfigEntry<int> BirthChanceFamily;
     public static ConfigEntry<int> NextBirthChance;
+    public static ConfigEntry<int> FreeRatioTreshold;
 
     private void Awake()
     {
@@ -74,7 +75,7 @@ public class Plugin : BaseUnityPlugin
         s_Log = LogManager.GetLogger(MyPluginInfo.PLUGIN_NAME);
 
         TeenAgeLimitInDays = base.Config.Bind<int>("Lifecycle", "TeenAgeLimitInDays", 12, "When Children become Teens; Vanilla 21");
-        AdultAgeLimitInDays = base.Config.Bind<int>("Lifecycle", "AdultAgeLimitInDays", 21, "When Teens become Adults; Vanilla 36");
+        AdultAgeLimitInDays = base.Config.Bind<int>("Lifecycle", "AdultAgeLimitInDays", 20, "When Teens become Adults; Vanilla 36");
         ElderAgeLimitInDays = base.Config.Bind<int>("Lifecycle", "ElderAgeLimitInDays", 75, "When Adults become Seniors; Vanilla 84");
         Education2InDays = base.Config.Bind<int>("Schools", "Education2InDays", 3, "How long High School should typically last (only for Teens)");
         Education3InDays = base.Config.Bind<int>("Schools", "Education3InDays", 4, "How long College should typically last (for both Teens and Adults)");
@@ -86,9 +87,10 @@ public class Plugin : BaseUnityPlugin
         NewAdultsAnyEducation = base.Config.Bind<bool>("NewCims", "NewAdultsAnyEducation", true, "Allow for newly spawned Adults and Seniors to have any education level; Vanilla allows only Educated");
         NoChildrenWhenTooOld = base.Config.Bind<bool>("NewCims", "NoChildrenWhenTooOld", true, "Does not allow for Adults to have Children when they cannot raise them before becoming Senior; Vanilla doesn't have such a restriction");
         AllowTeenStudents = base.Config.Bind<bool>("NewCims", "AllowTeenStudents", true, "Allow for Teens ready for College to be spawned as Students; Vanilla spawns always Adults");
-        BirthChanceSingle = base.Config.Bind<int>("Birth", "BirthChanceSingle", 25, "Base birth chance for a Single, rolled against 16000, 16x per day; Vanilla 20");
-        BirthChanceFamily = base.Config.Bind<int>("Birth", "BirthChanceFamily", 100, "Base birth chance for a Family, rolled against 16000, 16x per day; Vanilla 100");
-        NextBirthChance = base.Config.Bind<int>("Birth", "NextBirthChance", 95, "Set to less than 100 to lower the birth chance for each consecutive child; Vanilla 100");
+        BirthChanceSingle = base.Config.Bind<int>("Birth", "BirthChanceSingle", 30, "Base birth chance for a Single, rolled against 16000, 16x per day; Vanilla 20");
+        BirthChanceFamily = base.Config.Bind<int>("Birth", "BirthChanceFamily", 120, "Base birth chance for a Family, rolled against 16000, 16x per day; Vanilla 100");
+        NextBirthChance = base.Config.Bind<int>("Birth", "NextBirthChance", 97, "Set to less than 100 to lower the birth chance for each consecutive child; Vanilla 100");
+        FreeRatioTreshold = base.Config.Bind<int>("NewCims", "FreeRatioTreshold", 25, "Treshold for free properties ratio to start spawning new households (in 1/1000); Vanilla has no restrictions, set to -1 to turn off");
 
         Log($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
 

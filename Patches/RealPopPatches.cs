@@ -15,6 +15,7 @@ class RealPopPatches
         updateSystem.UpdateAt<AgingSystem_RealPop>(SystemUpdatePhase.GameSimulation);
         updateSystem.UpdateAt<ApplyToSchoolSystem_RealPop>(SystemUpdatePhase.GameSimulation);
         updateSystem.UpdateAt<BirthSystem_RealPop>(SystemUpdatePhase.GameSimulation);
+        updateSystem.UpdateAt<CountHomesSystem>(SystemUpdatePhase.GameSimulation);
         updateSystem.UpdateAt<GraduationSystem_RealPop>(SystemUpdatePhase.GameSimulation);
         updateSystem.UpdateAt<SchoolAISystem_RealPop>(SystemUpdatePhase.GameSimulation);
         updateSystem.UpdateAt<CitizenInitializeSystem_RealPop>(SystemUpdatePhase.Modification5);
@@ -109,6 +110,13 @@ class RealPopPatches
             comp.m_ChildCount = 1; // vanilla is missing classic 2+1 family
             Plugin.Log($"Patched {prefab.name} for ChildCount={comp.m_ChildCount} and Weight={comp.m_Weight}");
         }
+        else if (prefab.name == "DemandParameters") // 240208 fix for homeless demand factor
+        {
+            DemandPrefab comp = prefab.GetComponent<DemandPrefab>();
+            comp.m_HomelessEffect = 20f; // vanilla is 0.2f which makes it virtually meaningless
+            Plugin.Log($"Patched {prefab.name} for HomelessEffect={comp.m_HomelessEffect}");
+        }
         return true;
     }
+
 }
