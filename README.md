@@ -2,6 +2,7 @@
 The goal of this mod is to rebalance population structure and education needs, to be more realistic. It will reduce the number of Children and increase the number or Teens, thus balancing the needs for Elementary and High Schools.
 
 Version 0.5 introduces lots of fixes and changes to Birth and New Households processes. Please read the description. You may configure most of them or even turned off, if you like so.
+
 Version 0.6 changes the assembly name - please remove the old config file RealPopMod.cfg.
 
 
@@ -46,7 +47,7 @@ Version 0.6 changes the assembly name - please remove the old config file RealPo
 ![Children](https://raw.githubusercontent.com/infixo/cs2-realpop/master/docs/children.png)
 
 ### New households limiter (v0.6)
-  - Limits spawning of new households when the number of empty properties falls below a configrable treshold (by default 3%). This allows for Teens becoming new Adults have a chance to actually find a property. In Vanilla game, new households spawn so fast that they occupy all available buildings and new adults are forced to leave the city.
+  - Limits spawning of new households when the number of empty properties falls below a configurable treshold (by default 3%). This allows for Teens becoming new Adults have a chance to actually find a property. In Vanilla game, new households spawn so fast that they occupy all available buildings and new adults are forced to leave the city.
   - As a result it **heavily reduces the number of cims Moving Away**.
   - The feature can be turned off by setting the option FreeRatioTreshold to -1.
 

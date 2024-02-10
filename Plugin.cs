@@ -90,7 +90,7 @@ public class Plugin : BaseUnityPlugin
         BirthChanceSingle = base.Config.Bind<int>("Birth", "BirthChanceSingle", 30, "Base birth chance for a Single, rolled against 16000, 16x per day; Vanilla 20");
         BirthChanceFamily = base.Config.Bind<int>("Birth", "BirthChanceFamily", 120, "Base birth chance for a Family, rolled against 16000, 16x per day; Vanilla 100");
         NextBirthChance = base.Config.Bind<int>("Birth", "NextBirthChance", 97, "Set to less than 100 to lower the birth chance for each consecutive child; Vanilla 100");
-        FreeRatioTreshold = base.Config.Bind<int>("NewCims", "FreeRatioTreshold", 25, "Treshold for free properties ratio to start spawning new households (in 1/1000); Vanilla has no restrictions, set to -1 to turn off");
+        FreeRatioTreshold = base.Config.Bind<int>("NewCims", "FreeRatioTreshold", 30, "Treshold for free properties ratio to start spawning new households (in 1/1000); Vanilla has no restrictions, set to -1 to turn off");
 
         Log($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
 

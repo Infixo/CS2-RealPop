@@ -3,6 +3,8 @@ The goal of this mod is to rebalance population structure and education needs, t
 
 Version 0.5 introduces lots of fixes and changes to Birth and New Households processes. Please read the description. You may configure most of them or even turned off, if you like so.
 
+Version 0.6 changes the assembly name - please remove the old config file RealPopMod.cfg.
+
 
 ## Features
 
@@ -27,7 +29,7 @@ Version 0.5 introduces lots of fixes and changes to Birth and New Households pro
   
 ![Education](https://raw.githubusercontent.com/infixo/cs2-realpop/master/docs/edu_change.png)
   
-### New households
+### New households (v0.5)
   - Fixes CoupleHousehold having only 1 Adult. This bug is the main reason why so many singles move into the city. The mod makes CoupleHousehold as having 2 Adults.
   - Since there is no typical 2+1 family defined (sic!), the mod changes 2+5 family into 2+1 family. Also boosts a bit chances of 2+2 families. This further improves the structure of incoming families.
   - Fixes the bug where Children and Teens, all are spawned with age 0.
@@ -35,7 +37,7 @@ Version 0.5 introduces lots of fixes and changes to Birth and New Households pro
   - Allows for Adults to be at any education level. This can be turned on/off in the config file, option NewAdultsAnyEducation.
   - Allows for Teens to be spawned as StudentHousehold. They are College-ready. This can be turned on/off in the config file, option AllowTeenStudents.
   
-### Birth process  
+### Birth process (v0.5)
   - Adults cannot have children if they won't be able to raise them before becoming Seniors. This should prevent from having families like 1 Senior with 2 Children, that usually trigger High Rent warning. This can be turned on/off in the config file, option NoChildrenWhenTooOld.
   - Introduces configurable params to control birth process, BirthChanceSingle, BirthChanceFamily and NextBirthChance. You can define a base chance to have a baby for a single mother, a family and decrease in chance with each consecutive baby.
   - The chance of having a baby is halved also when a father is a student.
@@ -44,8 +46,10 @@ Version 0.5 introduces lots of fixes and changes to Birth and New Households pro
 
 ![Children](https://raw.githubusercontent.com/infixo/cs2-realpop/master/docs/children.png)
 
-### Planned Features
-- Tweaks to LeaveHome and Death processes.
+### New households limiter (v0.6)
+  - Limits spawning of new households when the number of empty properties falls below a configurable treshold (by default 3%). This allows for Teens becoming new Adults have a chance to actually find a property. In Vanilla game, new households spawn so fast that they occupy all available buildings and new adults are forced to leave the city.
+  - As a result it **heavily reduces the number of cims Moving Away**.
+  - The feature can be turned off by setting the option FreeRatioTreshold to -1.
 
 ## Technical
 
@@ -56,13 +60,16 @@ Version 0.5 introduces lots of fixes and changes to Birth and New Households pro
 - Cim Behavior Improvements is not compatible (both modify ApplyToSchoolSystem and BirthSystem).
 
 ### Installation
-1. Place the `RealPopMod.dll` file in your BepInEx `Plugins` folder.
-2. The config file is automatically created when the game is run once.
+1. Place the `RealPop.dll` file in your BepInEx `Plugins` folder.
+2. The config file is automatically created (in BepInEx\config) when the game is run once.
 
 ### Known Issues
 - Nothing atm.
 
 ### Changelog
+- v0.6.0 (2024-02-10)
+  - New households limiter.
+  - Updated default config values and new assembly name.
 - v0.5.0 (2024-02-05)
   - Fixes and tweaks to Birth process and New households.
 - v0.4.0 (2024-01-31)
