@@ -19,11 +19,13 @@ using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine.Scripting;
+using Game;
+using Game.Simulation;
 
-namespace Game.Simulation;
+namespace RealPop.Systems;
 
 [CompilerGenerated]
-public class DeathCheckSystem : GameSystemBase
+public class DeathCheckSystem_RealPop : GameSystemBase
 {
     [BurstCompile]
     private struct DeathCheckJob : IJobChunk
@@ -181,6 +183,8 @@ public class DeathCheckSystem : GameSystemBase
                 {
                     continue;
                 }
+
+                /* ORIGINAL CODE
                 float ageInDays = citizen.GetAgeInDays(m_SimulationFrame, m_TimeData);
                 if (ageInDays / (float)m_TimeSettings.m_DaysPerYear >= (float)kMaxAge)
                 {
@@ -191,6 +195,22 @@ public class DeathCheckSystem : GameSystemBase
                         continue;
                     }
                 }
+                */
+                // RealPop
+                int ageInDays = TimeSystem.GetDay(m_SimulationFrame, m_TimeData) - citizen.m_BirthDay;
+                if (ageInDays > s_DeathStartAge)
+                {
+                    int deathChance = (ageInDays - s_DeathStartAge) * s_DeathChanceIncrease;
+                    //bool isDead = citizen.GetPseudoRandom(CitizenPseudoRandom.Death).NextInt(1000) < deathChance; // Infixo: doesn't generate good random numbers (!)
+                    bool isDead = random.NextInt(1000) < deathChance;
+                    //Plugin.Log($"Death: {ageInDays} {deathChance} -> {isDead}");
+                    if (isDead)
+                    {
+                        Die(chunk, unfilteredChunkIndex, i, entity, household, nativeArray4, nativeArray2);
+                        continue;
+                    }
+                }
+
                 if (!nativeArray2.IsCreated || (nativeArray2[i].m_Flags & (HealthProblemFlags.Sick | HealthProblemFlags.Injured)) == 0)
                 {
                     continue;
@@ -338,6 +358,10 @@ public class DeathCheckSystem : GameSystemBase
 
     private TypeHandle __TypeHandle;
 
+    private static int s_DeathChanceIncrease; // RealPop
+
+    private static int s_DeathStartAge; // RealPop
+
     public override int GetUpdateInterval(SystemUpdatePhase phase)
     {
         return 262144 / (kUpdatesPerDay * 16);
@@ -360,6 +384,10 @@ public class DeathCheckSystem : GameSystemBase
         m_TimeDataQuery = GetEntityQuery(ComponentType.ReadOnly<TimeData>());
         RequireForUpdate(m_DeathCheckQuery);
         RequireForUpdate(m_HealthcareSettingsQuery);
+        // RealPop
+        s_DeathStartAge = Plugin.ElderAgeLimitInDays.Value;
+        s_DeathChanceIncrease = Plugin.DeathChanceIncrease.Value;
+        Plugin.Log($"Modded DeathCheckSystem created. DeathStartAge={s_DeathStartAge}, DeathChanceIncrease={s_DeathChanceIncrease}.");
     }
 
     [Preserve]
@@ -454,7 +482,7 @@ public class DeathCheckSystem : GameSystemBase
     }
 
     [Preserve]
-    public DeathCheckSystem()
+    public DeathCheckSystem_RealPop()
     {
     }
 }

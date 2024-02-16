@@ -66,6 +66,7 @@ public class Plugin : BaseUnityPlugin
     public static ConfigEntry<int> BirthChanceFamily;
     public static ConfigEntry<int> NextBirthChance;
     public static ConfigEntry<int> FreeRatioTreshold;
+    public static ConfigEntry<int> DeathChanceIncrease;
 
     private void Awake()
     {
@@ -91,6 +92,7 @@ public class Plugin : BaseUnityPlugin
         BirthChanceFamily = base.Config.Bind<int>("Birth", "BirthChanceFamily", 120, "Base birth chance for a Family, rolled against 16000, 16x per day; Vanilla 100");
         NextBirthChance = base.Config.Bind<int>("Birth", "NextBirthChance", 97, "Set to less than 100 to lower the birth chance for each consecutive child; Vanilla 100");
         FreeRatioTreshold = base.Config.Bind<int>("NewCims", "FreeRatioTreshold", 30, "Treshold for free properties ratio to start spawning new households (in 1/1000); Vanilla has no restrictions, set to -1 to turn off");
+        DeathChanceIncrease = base.Config.Bind<int>("Lifecycle", "DeathChanceIncrease", 4, "Increase in death chance per mille per year; set to 0 to turn off and use Vanilla process");
 
         Log($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
 

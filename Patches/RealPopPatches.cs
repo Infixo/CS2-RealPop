@@ -19,6 +19,10 @@ class RealPopPatches
         updateSystem.UpdateAt<GraduationSystem_RealPop>(SystemUpdatePhase.GameSimulation);
         updateSystem.UpdateAt<SchoolAISystem_RealPop>(SystemUpdatePhase.GameSimulation);
         updateSystem.UpdateAt<CitizenInitializeSystem_RealPop>(SystemUpdatePhase.Modification5);
+        if (Plugin.DeathChanceIncrease.Value > 0)
+            updateSystem.UpdateAt<DeathCheckSystem_RealPop>(SystemUpdatePhase.GameSimulation);
+        else
+            Plugin.Log("Using original DeathCheckSystem.");
     }
 
     [HarmonyPatch(typeof(Game.Simulation.AgingSystem), "OnUpdate")]
@@ -42,6 +46,13 @@ class RealPopPatches
     static bool BirthSystem_OnUpdate(Game.Simulation.BirthSystem __instance)
     {
         return false; // don't execute the original system
+    }
+
+    [HarmonyPatch(typeof(Game.Simulation.DeathCheckSystem), "OnUpdate")]
+    [HarmonyPrefix]
+    static bool DeathCheckSystem_OnUpdate()
+    {
+        return Plugin.DeathChanceIncrease.Value <= 0; // don't execute the original if set to >0
     }
 
     [HarmonyPatch(typeof(Game.Simulation.GraduationSystem), "OnUpdate")]
