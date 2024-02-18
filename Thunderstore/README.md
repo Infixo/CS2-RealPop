@@ -1,9 +1,7 @@
 # Population and Education Rebalance Mod
 The goal of this mod is to rebalance population structure and education needs, to be more realistic. It will reduce the number of Children and increase the number or Teens, thus balancing the needs for Elementary and High Schools.
 
-Version 0.5 introduces lots of fixes and changes to Birth and New Households processes. Please read the description. You may configure most of them or even turned off, if you like so.
-
-Version 0.6 changes the assembly name - please remove the old config file RealPopMod.cfg.
+Version 0.7 introduces a new death process. There will be more deaths! Please read the description and turn it off if you prefer the vanilla approach.
 
 
 ## Features
@@ -50,13 +48,19 @@ Version 0.6 changes the assembly name - please remove the old config file RealPo
   - Limits spawning of new households when the number of empty properties falls below a configurable treshold (by default 3%). This allows for Teens becoming new Adults have a chance to actually find a property. In Vanilla game, new households spawn so fast that they occupy all available buildings and new adults are forced to leave the city.
   - As a result it **heavily reduces the number of cims Moving Away**.
   - The feature can be turned off by setting the option FreeRatioTreshold to -1.
+  
+### Updated death process (v0.7)
+  - Cims will have a chance to die of old age once they become Elders. In vanilla game they start dying at 108 days.
+  - The chance of death increases with age, by a factor set in the config file (parameter DeathChanceIncrease). In vanilla game they all die within 12 days.
+  - You may turn off this new process and use vanilla logic by setting DeathChanceIncrease to 0.
+  - Warning! There will be much more deaths than in vanilla game and you need to expand your Deathcare. In vanilla Seniors usually leave the city due to rent problems long before they reach the dying treshold, so there is not much use for a Deathcare.
 
 ## Technical
 
 ### Requirements and Compatibility
 - Cities Skylines II version 1.0.19f1 or later; check GitHub or Discord if the mod is compatible with the latest game version.
 - BepInEx 5.
-- Modified systems: AgingSystem, ApplyToSchoolSystem, BirthSystem, CitizenInitializeSystem, GraduationSystem, SchoolAISystem.
+- Modified systems: AgingSystem, ApplyToSchoolSystem, BirthSystem, CitizenInitializeSystem, DeathCheckSystem, GraduationSystem, SchoolAISystem.
 - Cim Behavior Improvements is not compatible (both modify ApplyToSchoolSystem and BirthSystem).
 
 ### Installation
@@ -67,6 +71,8 @@ Version 0.6 changes the assembly name - please remove the old config file RealPo
 - Nothing atm.
 
 ### Changelog
+- v0.7.0 (2024-02-18)
+  - New death process.
 - v0.6.0 (2024-02-10)
   - New households limiter.
   - Updated default config values and new assembly name.

@@ -60,7 +60,7 @@ Version 0.7 introduces a new death process. There will be more deaths! Please re
 ### Requirements and Compatibility
 - Cities Skylines II version 1.0.19f1 or later; check GitHub or Discord if the mod is compatible with the latest game version.
 - BepInEx 5.
-- Modified systems: AgingSystem, ApplyToSchoolSystem, BirthSystem, CitizenInitializeSystem, GraduationSystem, SchoolAISystem.
+- Modified systems: AgingSystem, ApplyToSchoolSystem, BirthSystem, CitizenInitializeSystem, DeathCheckSystem, GraduationSystem, SchoolAISystem.
 - Cim Behavior Improvements is not compatible (both modify ApplyToSchoolSystem and BirthSystem).
 
 ### Installation

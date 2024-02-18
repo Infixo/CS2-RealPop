@@ -27,7 +27,7 @@ class RealPopPatches
 
     [HarmonyPatch(typeof(Game.Simulation.AgingSystem), "OnUpdate")]
     [HarmonyPrefix]
-    static bool AgingSystem_OnUpdate(Game.Simulation.AgingSystem __instance)
+    static bool AgingSystem_OnUpdate()
     {
         //RealPop.Debug.Log("Original AgingSystem disabled.");
         //__instance.World.GetOrCreateSystemManaged<RealPop.Systems.AgingSystem_RealPop>().Update();
@@ -36,14 +36,14 @@ class RealPopPatches
 
     [HarmonyPatch(typeof(Game.Simulation.ApplyToSchoolSystem), "OnUpdate")]
     [HarmonyPrefix]
-    static bool ApplyToSchoolSystem_OnUpdate(Game.Simulation.ApplyToSchoolSystem __instance)
+    static bool ApplyToSchoolSystem_OnUpdate()
     {
         return false; // don't execute the original system
     }
 
     [HarmonyPatch(typeof(Game.Simulation.BirthSystem), "OnUpdate")]
     [HarmonyPrefix]
-    static bool BirthSystem_OnUpdate(Game.Simulation.BirthSystem __instance)
+    static bool BirthSystem_OnUpdate()
     {
         return false; // don't execute the original system
     }
@@ -57,7 +57,7 @@ class RealPopPatches
 
     [HarmonyPatch(typeof(Game.Simulation.GraduationSystem), "OnUpdate")]
     [HarmonyPrefix]
-    static bool GraduationSystem_OnUpdate(Game.Simulation.GraduationSystem __instance)
+    static bool GraduationSystem_OnUpdate()
     {
         return false; // don't execute the original system
     }

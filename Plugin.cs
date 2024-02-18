@@ -88,7 +88,7 @@ public class Plugin : BaseUnityPlugin
         NewAdultsAnyEducation = base.Config.Bind<bool>("NewCims", "NewAdultsAnyEducation", true, "Allow for newly spawned Adults and Seniors to have any education level; Vanilla allows only Educated");
         NoChildrenWhenTooOld = base.Config.Bind<bool>("NewCims", "NoChildrenWhenTooOld", true, "Does not allow for Adults to have Children when they cannot raise them before becoming Senior; Vanilla doesn't have such a restriction");
         AllowTeenStudents = base.Config.Bind<bool>("NewCims", "AllowTeenStudents", true, "Allow for Teens ready for College to be spawned as Students; Vanilla spawns always Adults");
-        BirthChanceSingle = base.Config.Bind<int>("Birth", "BirthChanceSingle", 30, "Base birth chance for a Single, rolled against 16000, 16x per day; Vanilla 20");
+        BirthChanceSingle = base.Config.Bind<int>("Birth", "BirthChanceSingle", 35, "Base birth chance for a Single, rolled against 16000, 16x per day; Vanilla 20");
         BirthChanceFamily = base.Config.Bind<int>("Birth", "BirthChanceFamily", 120, "Base birth chance for a Family, rolled against 16000, 16x per day; Vanilla 100");
         NextBirthChance = base.Config.Bind<int>("Birth", "NextBirthChance", 97, "Set to less than 100 to lower the birth chance for each consecutive child; Vanilla 100");
         FreeRatioTreshold = base.Config.Bind<int>("NewCims", "FreeRatioTreshold", 30, "Treshold for free properties ratio to start spawning new households (in 1/1000); Vanilla has no restrictions, set to -1 to turn off");

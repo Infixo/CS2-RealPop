@@ -12,7 +12,7 @@
 		<AssemblyName>RealPop</AssemblyName>
 		<RootNamespace>RealPop</RootNamespace>
 		<Description>Rebalanced Population and Education</Description>
-		<Version>0.6.0</Version>
+		<Version>0.7.0</Version>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<LangVersion>latest</LangVersion>
 		<RestoreAdditionalProjectSources>
@@ -60,6 +60,14 @@
 		<Reference Include="libcs2/Colossal.*.dll" Private="False" />
 		<Reference Include="libcs2/Game.dll" Private="False" />
 		<Reference Include="libcs2/Unity.*.dll" Private="False" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Compile Remove="Systems\HouseholdSpawnSystem.cs" />
+	  <Compile Remove="Systems\LookForPartnerSystem.cs" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Include="Systems\HouseholdSpawnSystem.cs" />
+	  <None Include="Systems\LookForPartnerSystem.cs" />
 	</ItemGroup>
 
 	<!--
