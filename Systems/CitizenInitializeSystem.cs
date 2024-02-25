@@ -12,7 +12,6 @@ using Unity.Mathematics;
 using UnityEngine.Scripting;
 using Game;
 using Game.Citizens;
-using static Unity.Burst.Intrinsics.X86.Avx;
 
 namespace RealPop.Systems;
 
@@ -67,6 +66,9 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
         [ReadOnly]
         public NativeArray<int> m_FreeWorkplaces; // RealPop
 
+        [ReadOnly]
+        public Colossal.Collections.NativeValue<int> m_StudyPositions; // RealPop
+
         public void Execute()
         {
             //RealPop.Debug.Log($"initializing {m_Entities.Length} citizens");
@@ -110,7 +112,7 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
                 });
                 // Infixo: num2 is an actual age that will be used to replace m_BirthDay at the end
                 int num2 = 0;
-                int citClass = citizen.m_BirthDay; // debug
+                //int citClass = citizen.m_BirthDay; // debug
                 if (citizen.m_BirthDay == 0)
                 {
                     citizen.SetAge(CitizenAge.Child);
@@ -167,6 +169,13 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
                             for (int c = 0; c < m_FreeWorkplaces.Length; c++)
                             {
                                 total += m_FreeWorkplaces[c];
+                            }
+                            // stop bringing Well and Highly edu once College is available
+                            // TODO: this should be done using DevTree and checking if specific service is unlocked
+                            if (m_StudyPositions.value > 0)
+                            {
+                                m_FreeWorkplaces[3] = 0;
+                                m_FreeWorkplaces[4] = 0;
                             }
                             //Plugin.Log($"Chances {total}: {m_FreeWorkplaces[0]} {m_FreeWorkplaces[1]} {m_FreeWorkplaces[2]} {m_FreeWorkplaces[3]} {m_FreeWorkplaces[4]}");
                             int eduLevel = 0;
@@ -304,6 +313,8 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
 
     private CountFreeWorkplacesSystem m_CountFreeWorkplacesSystem;
 
+    private CountStudyPositionsSystem m_CountStudyPositionsSystem;
+
     private ModificationBarrier5 m_EndFrameBarrier;
 
     private TypeHandle __TypeHandle;
@@ -334,6 +345,7 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
         RequireForUpdate(m_DemandParameterQuery);
         // RealPop
         m_CountFreeWorkplacesSystem = base.World.GetOrCreateSystemManaged<CountFreeWorkplacesSystem>();
+        m_CountStudyPositionsSystem = base.World.GetOrCreateSystemManaged<CountStudyPositionsSystem>();
         s_NewAdultsAnyEducation = Plugin.NewAdultsAnyEducation.Value;
         s_NoChildrenWhenTooOld = Plugin.NoChildrenWhenTooOld.Value;
         s_AllowTeenStudents = Plugin.AllowTeenStudents.Value;
@@ -373,11 +385,13 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
         initializeCitizenJob.m_CommandBuffer = m_EndFrameBarrier.CreateCommandBuffer();
         initializeCitizenJob.m_TriggerBuffer = m_TriggerSystem.CreateActionBuffer();
         initializeCitizenJob.m_FreeWorkplaces = m_CountFreeWorkplacesSystem.GetFreeWorkplaces(out var outJobHandleFreeWorkplaces);
+        initializeCitizenJob.m_StudyPositions = m_CountStudyPositionsSystem.GetStudyPositions(out var outJobHandleStudyPositions); // This job handle will be ignored
         InitializeCitizenJob jobData = initializeCitizenJob;
         //Plugin.Log($"AllocTemp: frame {m_SimulationSystem.frameIndex}");// entities {initializeCitizenJob.m_Entities.Length} citizens {initializeCitizenJob.m_CitizenPrefabs.Length}");
         base.Dependency = IJobExtensions.Schedule(jobData, JobHandle.CombineDependencies(base.Dependency, outJobHandle, outJobHandleFreeWorkplaces));
         m_EndFrameBarrier.AddJobHandleForProducer(base.Dependency);
         m_CountFreeWorkplacesSystem.AddReader(base.Dependency); // RealPop
+        m_CountStudyPositionsSystem.AddReader(base.Dependency); // RealPop
     }
 
     public static Entity GetPrefab(NativeArray<Entity> citizenPrefabs, Citizen citizen, ComponentLookup<CitizenData> citizenDatas, Random rnd)
