@@ -12,14 +12,14 @@
 		<AssemblyName>RealPop</AssemblyName>
 		<RootNamespace>RealPop</RootNamespace>
 		<Description>Rebalanced Population and Education</Description>
-		<Version>0.7.0</Version>
+		<Version>0.8.0</Version>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<LangVersion>latest</LangVersion>
 		<RestoreAdditionalProjectSources>
 			https://api.nuget.org/v3/index.json;
-			https://nuget.bepinex.dev/v3/index.json;
 			https://nuget.samboy.dev/v3/index.json
 		</RestoreAdditionalProjectSources>
+		<!-- 			https://nuget.bepinex.dev/v3/index.json; -->
 		<!-- Copies references we make to 3rd party library for distributions -->
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 		<!-- Suppress the version conflict warnings for System.Net.Http and System.IO.Compression -->

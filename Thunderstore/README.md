@@ -7,7 +7,7 @@ Version 0.7 introduces a new death process. There will be more deaths! Please re
 ## Features
 
 ### Lifecycle adjustments
-  - Default thresholds for licycle stages are changed from 21/36/84 to 12/21/75. As a result, population structure should be more realistic i.e. 15% Children, 10% Teens, 60% Adults and 15% Seniors. These are approximate numbers ofc, may differ in your cities.
+  - Default thresholds for licycle stages are changed from 21/36/84 to 12/20/75. As a result, population structure should be more realistic i.e. 15% Children, 10% Teens, 60% Adults and 15% Seniors. These are approximate numbers ofc, may differ in your cities.
   - The thresholds can be individually set in the config file.
   - At the end you should see the changes in population structure like this.
 
@@ -33,6 +33,7 @@ Version 0.7 introduces a new death process. There will be more deaths! Please re
   - Fixes the bug where Children and Teens, all are spawned with age 0.
   - Fixes the bug where all StudentHousehold are single Adults at fixed age 36.
   - Allows for Adults to be at any education level. This can be turned on/off in the config file, option NewAdultsAnyEducation.
+  - (v0.8) Until the first College is built, the cims will have an education adjusted to open jobs. After that, Well and Highly Educated cims won't come - you need to educate your citizens!
   - Allows for Teens to be spawned as StudentHousehold. They are College-ready. This can be turned on/off in the config file, option AllowTeenStudents.
   
 ### Birth process (v0.5)
@@ -45,15 +46,17 @@ Version 0.7 introduces a new death process. There will be more deaths! Please re
 ![Children](https://raw.githubusercontent.com/infixo/cs2-realpop/master/docs/children.png)
 
 ### New households limiter (v0.6)
-  - Limits spawning of new households when the number of empty properties falls below a configurable treshold (by default 3%). This allows for Teens becoming new Adults have a chance to actually find a property. In Vanilla game, new households spawn so fast that they occupy all available buildings and new adults are forced to leave the city.
+  - Limits spawning of new households when the number of empty properties falls below a configurable treshold (by default 2,5%). This allows for Teens becoming new Adults have a chance to actually find a property. In Vanilla game, new households spawn so fast that they occupy all available buildings and new adults are forced to leave the city.
   - As a result it **heavily reduces the number of cims Moving Away**.
   - The feature can be turned off by setting the option FreeRatioTreshold to -1.
+  - (v0.8) The limiter is dynamic, the more empty homes, the faster new cims will spawn. By default at 7,5% they will spawn at full speed (set via FreeRatioFullSpeed config parameter).
   
 ### Updated death process (v0.7)
   - Cims will have a chance to die of old age once they become Elders. In vanilla game they start dying at 108 days.
   - The chance of death increases with age, by a factor set in the config file (parameter DeathChanceIncrease). In vanilla game they all die within 12 days.
   - You may turn off this new process and use vanilla logic by setting DeathChanceIncrease to 0.
   - Warning! There will be much more deaths than in vanilla game and you need to expand your Deathcare. In vanilla Seniors usually leave the city due to rent problems long before they reach the dying treshold, so there is not much use for a Deathcare.
+  - (v0.8) Corpses have a default chance of 30% to vanish, so there will be less need for Deathcare (use config param CorpseVanishChance to change that).
 
 ## Technical
 
@@ -71,6 +74,10 @@ Version 0.7 introduces a new death process. There will be more deaths! Please re
 - Nothing atm.
 
 ### Changelog
+- v0.8.0 (2024-02-25)
+  - Fixed issue with highly educated cims coming in too early.
+  - Corpses have a chance to vanish.
+  - Dynamic speed of new cims spawning.
 - v0.7.0 (2024-02-18)
   - New death process.
 - v0.6.0 (2024-02-10)
