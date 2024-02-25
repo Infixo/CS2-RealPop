@@ -64,6 +64,9 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
 
         public EntityCommandBuffer m_CommandBuffer;
 
+        [ReadOnly]
+        public NativeArray<int> m_FreeWorkplaces; // RealPop
+
         public void Execute()
         {
             //RealPop.Debug.Log($"initializing {m_Entities.Length} citizens");
@@ -158,7 +161,36 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
                     {
                         // non-commuters
                         if (s_NewAdultsAnyEducation) // modded
-                            citizen.SetEducationLevel((random.NextInt(8) + 1) / 2);
+                        {
+                            // 240224, Issue #12 adjust education to available jobs
+                            int total = 0;
+                            for (int c = 0; c < m_FreeWorkplaces.Length; c++)
+                            {
+                                total += m_FreeWorkplaces[c];
+                            }
+                            //Plugin.Log($"Chances {total}: {m_FreeWorkplaces[0]} {m_FreeWorkplaces[1]} {m_FreeWorkplaces[2]} {m_FreeWorkplaces[3]} {m_FreeWorkplaces[4]}");
+                            int eduLevel = 0;
+                            if (total == 0) // no free workplaces, fallback to vanilla behavior to avoid problems in early game
+                            {
+                                eduLevel = (random.NextInt(5) + 1) / 2;
+                                //Plugin.Log($"... edu level {eduLevel}");
+                            }
+                            else // roll a dynamic edu level
+                            {
+                                int roll = random.NextInt(total);
+                                for (int c = m_FreeWorkplaces.Length-1; c >= 0; c--)
+                                {
+                                    total -= m_FreeWorkplaces[c];
+                                    if (roll >= total)
+                                    {
+                                        eduLevel = c;
+                                        break;
+                                    }
+                                }
+                                //Plugin.Log($"... edu level {eduLevel}, rolled {roll}");
+                            }
+                            citizen.SetEducationLevel(eduLevel);
+                        }
                         else // vanilla behavior, 20% 0, 40% 1, 40% 1
                             citizen.SetEducationLevel((random.NextInt(5) + 1) / 2);
                     }
@@ -270,6 +302,8 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
 
     private TriggerSystem m_TriggerSystem;
 
+    private CountFreeWorkplacesSystem m_CountFreeWorkplacesSystem;
+
     private ModificationBarrier5 m_EndFrameBarrier;
 
     private TypeHandle __TypeHandle;
@@ -299,6 +333,7 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
         RequireForUpdate(m_TimeSettingGroup);
         RequireForUpdate(m_DemandParameterQuery);
         // RealPop
+        m_CountFreeWorkplacesSystem = base.World.GetOrCreateSystemManaged<CountFreeWorkplacesSystem>();
         s_NewAdultsAnyEducation = Plugin.NewAdultsAnyEducation.Value;
         s_NoChildrenWhenTooOld = Plugin.NoChildrenWhenTooOld.Value;
         s_AllowTeenStudents = Plugin.AllowTeenStudents.Value;
@@ -337,10 +372,12 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
         initializeCitizenJob.m_RandomSeed = RandomSeed.Next();
         initializeCitizenJob.m_CommandBuffer = m_EndFrameBarrier.CreateCommandBuffer();
         initializeCitizenJob.m_TriggerBuffer = m_TriggerSystem.CreateActionBuffer();
+        initializeCitizenJob.m_FreeWorkplaces = m_CountFreeWorkplacesSystem.GetFreeWorkplaces(out var outJobHandleFreeWorkplaces);
         InitializeCitizenJob jobData = initializeCitizenJob;
         //Plugin.Log($"AllocTemp: frame {m_SimulationSystem.frameIndex}");// entities {initializeCitizenJob.m_Entities.Length} citizens {initializeCitizenJob.m_CitizenPrefabs.Length}");
-        base.Dependency = IJobExtensions.Schedule(jobData, JobHandle.CombineDependencies(base.Dependency, outJobHandle));
+        base.Dependency = IJobExtensions.Schedule(jobData, JobHandle.CombineDependencies(base.Dependency, outJobHandle, outJobHandleFreeWorkplaces));
         m_EndFrameBarrier.AddJobHandleForProducer(base.Dependency);
+        m_CountFreeWorkplacesSystem.AddReader(base.Dependency); // RealPop
     }
 
     public static Entity GetPrefab(NativeArray<Entity> citizenPrefabs, Citizen citizen, ComponentLookup<CitizenData> citizenDatas, Random rnd)
