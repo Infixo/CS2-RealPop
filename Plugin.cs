@@ -68,6 +68,7 @@ public class Plugin : BaseUnityPlugin
     public static ConfigEntry<int> FreeRatioTreshold;
     public static ConfigEntry<int> FreeRatioFullSpeed;
     public static ConfigEntry<int> DeathChanceIncrease;
+    public static ConfigEntry<int> CorpseVanishChance;
 
     private void Awake()
     {
@@ -95,6 +96,7 @@ public class Plugin : BaseUnityPlugin
         FreeRatioTreshold = base.Config.Bind<int>("NewCims", "FreeRatioTreshold", 25, "Treshold for free properties ratio to start spawning new households (in 1/1000); Vanilla has no restrictions, set to -1 to turn off");
         FreeRatioFullSpeed = base.Config.Bind<int>("NewCims", "FreeRatioFullSpeed", 75, "Treshold for free properties ratio to spawn new households at full speed (in 1/1000); Vanilla has no restrictions");
         DeathChanceIncrease = base.Config.Bind<int>("Lifecycle", "DeathChanceIncrease", 4, "Increase in death chance per mille per year; set to 0 to turn off and use Vanilla process");
+        CorpseVanishChance = base.Config.Bind<int>("Lifecycle", "CorpseVanishChance", 30, "Percent chance for a corpse to vanish after death; Vanilla has no such feature, set to 0 to turn off");
 
         Log($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
 

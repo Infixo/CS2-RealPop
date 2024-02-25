@@ -108,12 +108,16 @@ public class DeathCheckSystem_RealPop : GameSystemBase
 
         public uint m_SimulationFrame;
 
-        private void Die(ArchetypeChunk chunk, int chunkIndex, int i, Entity citizen, Entity household, NativeArray<Game.Citizens.Student> students, NativeArray<HealthProblem> healthProblems)
+        private void Die(ArchetypeChunk chunk, int chunkIndex, int i, Entity citizen, Entity household, NativeArray<Game.Citizens.Student> students, NativeArray<HealthProblem> healthProblems, Random random)
         {
+            // 240224 Issue #10, vanish corpse
+            bool isVanishCorpse = random.NextInt(100) < s_CorpseVanishChance;
             if (!healthProblems.IsCreated)
             {
                 HealthProblem healthProblem = default(HealthProblem);
                 healthProblem.m_Flags = HealthProblemFlags.Dead | HealthProblemFlags.RequireTransport;
+                if (isVanishCorpse)
+                    healthProblem.m_Flags &= ~HealthProblemFlags.RequireTransport;
                 HealthProblem component = healthProblem;
                 m_CommandBuffer.AddComponent(chunkIndex, citizen, component);
             }
@@ -127,6 +131,8 @@ public class DeathCheckSystem_RealPop : GameSystemBase
                 }
                 value.m_Flags &= ~(HealthProblemFlags.Sick | HealthProblemFlags.Injured);
                 value.m_Flags |= HealthProblemFlags.Dead | HealthProblemFlags.RequireTransport;
+                if (isVanishCorpse)
+                    value.m_Flags &= ~HealthProblemFlags.RequireTransport;
                 healthProblems[i] = value;
             }
             PerformAfterDeathActions(citizen, household, m_TriggerBuffer, m_StatisticsEventQueue, ref m_HouseholdCitizens);
@@ -150,6 +156,12 @@ public class DeathCheckSystem_RealPop : GameSystemBase
             if (chunk.Has(ref m_LeisureType))
             {
                 m_CommandBuffer.RemoveComponent<Leisure>(chunkIndex, citizen);
+            }
+            // 240224 Issue #10, vanish corpse
+            if (isVanishCorpse)
+            {
+                //Plugin.Log($"vanish corpse");
+                m_CommandBuffer.AddComponent(chunkIndex, citizen, default(Deleted));
             }
         }
 
@@ -206,7 +218,7 @@ public class DeathCheckSystem_RealPop : GameSystemBase
                     //Plugin.Log($"Death: {ageInDays} {deathChance} -> {isDead}");
                     if (isDead)
                     {
-                        Die(chunk, unfilteredChunkIndex, i, entity, household, nativeArray4, nativeArray2);
+                        Die(chunk, unfilteredChunkIndex, i, entity, household, nativeArray4, nativeArray2, random);
                         continue;
                     }
                 }
@@ -221,7 +233,7 @@ public class DeathCheckSystem_RealPop : GameSystemBase
                 num3 += 8;
                 if (random.NextInt(kUpdatesPerDay * 1000) <= num3)
                 {
-                    Die(chunk, unfilteredChunkIndex, i, entity, household, nativeArray4, nativeArray2);
+                    Die(chunk, unfilteredChunkIndex, i, entity, household, nativeArray4, nativeArray2, random);
                     continue;
                 }
                 float num4 = MathUtils.Logistic(3f, 1000f, 6f, (float)num2 / 10f - 0.35f);
@@ -362,6 +374,8 @@ public class DeathCheckSystem_RealPop : GameSystemBase
 
     private static int s_DeathStartAge; // RealPop
 
+    private static int s_CorpseVanishChance; // RealPop
+
     public override int GetUpdateInterval(SystemUpdatePhase phase)
     {
         return 262144 / (kUpdatesPerDay * 16);
@@ -387,7 +401,8 @@ public class DeathCheckSystem_RealPop : GameSystemBase
         // RealPop
         s_DeathStartAge = Plugin.ElderAgeLimitInDays.Value;
         s_DeathChanceIncrease = Plugin.DeathChanceIncrease.Value;
-        Plugin.Log($"Modded DeathCheckSystem created. DeathStartAge={s_DeathStartAge}, DeathChanceIncrease={s_DeathChanceIncrease}.");
+        s_CorpseVanishChance = Plugin.CorpseVanishChance.Value;
+        Plugin.Log($"Modded DeathCheckSystem created. DeathStartAge={s_DeathStartAge}, DeathChanceIncrease={s_DeathChanceIncrease}, CorpseVanishChance={s_CorpseVanishChance}.");
     }
 
     [Preserve]
