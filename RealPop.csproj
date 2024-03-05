@@ -12,7 +12,7 @@
 		<AssemblyName>RealPop</AssemblyName>
 		<RootNamespace>RealPop</RootNamespace>
 		<Description>Rebalanced Population and Education</Description>
-		<Version>0.8.0</Version>
+		<Version>0.8.1</Version>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<LangVersion>latest</LangVersion>
 		<RestoreAdditionalProjectSources>

@@ -3,7 +3,6 @@ The goal of this mod is to rebalance population structure and education needs, t
 
 Version 0.7 introduces a new death process. There will be more deaths! Please read the description and turn it off if you prefer the vanilla approach.
 
-
 ## Features
 
 ### Lifecycle adjustments
@@ -74,6 +73,11 @@ Version 0.7 introduces a new death process. There will be more deaths! Please re
 - Nothing atm.
 
 ### Changelog
+- v0.8.1 (2024-03-05)
+  - Fixes game issue where new Households could spawn with a negative balance (as low as -300); now they spawn with balance betwen 2000 and 3000.
+  - Fixed issue with Uneducated cims coming even when there is no jobs for them.
+  - Lowered default DeathChanceIncrease from 4 to 3.
+  - Lowered thresholds for the new cims limiter feature from 25/75 to 20/60.
 - v0.8.0 (2024-02-25)
   - Fixed issue with highly educated cims coming in too early.
   - Corpses have a chance to vanish.

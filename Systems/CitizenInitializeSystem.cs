@@ -164,19 +164,13 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
                         // non-commuters
                         if (s_NewAdultsAnyEducation) // modded
                         {
-                            // 240224, Issue #12 adjust education to available jobs
-                            int total = 0;
-                            for (int c = 0; c < m_FreeWorkplaces.Length; c++)
-                            {
-                                total += m_FreeWorkplaces[c];
-                            }
-                            // stop bringing Well and Highly edu once College is available
+                            // 240224 Issue #12 adjust education to available jobs
+                            // Stop bringing Well and Highly edu once College is available
                             // TODO: this should be done using DevTree and checking if specific service is unlocked
-                            if (m_StudyPositions.value > 0)
-                            {
-                                m_FreeWorkplaces[3] = 0;
-                                m_FreeWorkplaces[4] = 0;
-                            }
+                            // 240305 Fix for Uneducated being rolled
+                            int total = m_FreeWorkplaces[0] + m_FreeWorkplaces[1] + m_FreeWorkplaces[2];
+                            if (m_StudyPositions.value <= 0)
+                                total += m_FreeWorkplaces[3] + m_FreeWorkplaces[4];
                             //Plugin.Log($"Chances {total}: {m_FreeWorkplaces[0]} {m_FreeWorkplaces[1]} {m_FreeWorkplaces[2]} {m_FreeWorkplaces[3]} {m_FreeWorkplaces[4]}");
                             int eduLevel = 0;
                             if (total == 0) // no free workplaces, fallback to vanilla behavior to avoid problems in early game
@@ -187,7 +181,8 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
                             else // roll a dynamic edu level
                             {
                                 int roll = random.NextInt(total);
-                                for (int c = m_FreeWorkplaces.Length-1; c >= 0; c--)
+                                int startLook = m_StudyPositions.value > 0 ? 2 : 4;
+                                for (int c = startLook; c >= 0; c--)
                                 {
                                     total -= m_FreeWorkplaces[c];
                                     if (roll >= total)
@@ -196,7 +191,7 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
                                         break;
                                     }
                                 }
-                                //Plugin.Log($"... edu level {eduLevel}, rolled {roll}");
+                                //Plugin.Log($"... edu level {eduLevel}, rolled {roll}, start {startLook}");
                             }
                             citizen.SetEducationLevel(eduLevel);
                         }

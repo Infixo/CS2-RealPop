@@ -93,10 +93,10 @@ public class Plugin : BaseUnityPlugin
         BirthChanceSingle = base.Config.Bind<int>("Birth", "BirthChanceSingle", 35, "Base birth chance for a Single, rolled against 16000, 16x per day; Vanilla 20");
         BirthChanceFamily = base.Config.Bind<int>("Birth", "BirthChanceFamily", 120, "Base birth chance for a Family, rolled against 16000, 16x per day; Vanilla 100");
         NextBirthChance = base.Config.Bind<int>("Birth", "NextBirthChance", 97, "Set to less than 100 to lower the birth chance for each consecutive child; Vanilla 100");
-        FreeRatioTreshold = base.Config.Bind<int>("NewCims", "FreeRatioTreshold", 25, "Treshold for free properties ratio to start spawning new households (in 1/1000); Vanilla has no restrictions, set to -1 to turn off");
-        FreeRatioFullSpeed = base.Config.Bind<int>("NewCims", "FreeRatioFullSpeed", 75, "Treshold for free properties ratio to spawn new households at full speed (in 1/1000); Vanilla has no restrictions");
-        DeathChanceIncrease = base.Config.Bind<int>("Lifecycle", "DeathChanceIncrease", 4, "Increase in death chance per mille per year; set to 0 to turn off and use Vanilla process");
-        CorpseVanishChance = base.Config.Bind<int>("Lifecycle", "CorpseVanishChance", 30, "Percent chance for a corpse to vanish after death; Vanilla has no such feature, set to 0 to turn off");
+        FreeRatioTreshold = base.Config.Bind<int>("NewCims", "FreeRatioTreshold", 20, "Treshold for free properties ratio to start spawning new households (in 1/1000); Vanilla has no restrictions, set to -1 to turn off");
+        FreeRatioFullSpeed = base.Config.Bind<int>("NewCims", "FreeRatioFullSpeed", 60, "Treshold for free properties ratio to spawn new households at full speed (in 1/1000); Vanilla has no restrictions");
+        DeathChanceIncrease = base.Config.Bind<int>("Lifecycle", "DeathChanceIncrease", 3, "Increase in death chance per mille per year; set to 0 to turn off and use Vanilla process");
+        CorpseVanishChance = base.Config.Bind<int>("Lifecycle", "CorpseVanishChance", 40, "Percent chance for a corpse to vanish after death; Vanilla has no such feature, set to 0 to turn off");
 
         Log($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
 

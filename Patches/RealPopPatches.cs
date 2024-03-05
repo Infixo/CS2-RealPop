@@ -125,7 +125,18 @@ class RealPopPatches
         {
             DemandPrefab comp = prefab.GetComponent<DemandPrefab>();
             comp.m_HomelessEffect = 20f; // vanilla is 0.2f which makes it virtually meaningless
+            comp.m_NeutralHappiness = 60; // vanilla is 50
+            comp.m_NeutralUnemployment = 8.0f; // vanilla is 10
+            comp.m_NeutralHomelessness = 1.5f; // vanilla is 2
             Plugin.Log($"Patched {prefab.name} for HomelessEffect={comp.m_HomelessEffect}");
+            Plugin.Log($"Modded {prefab.name}: NeutralHappiness={comp.m_NeutralHappiness}, NeutralUnemployment={comp.m_NeutralUnemployment}, NeutralHomelessness={comp.m_NeutralHomelessness}.");
+        }
+        // 240302 Fix for new households coming very poor to the city (even with negative balances)
+        if (prefab.GetType() == typeof(HouseholdPrefab) && prefab.name != "DynamicHousehold")
+        {
+            HouseholdPrefab householdPrefab = prefab as HouseholdPrefab;
+            householdPrefab.m_InitialWealthOffset = 2500;
+            Plugin.Log($"Patched {prefab.name} for InitialWealthOffset={householdPrefab.m_InitialWealthOffset}");
         }
         return true;
     }
