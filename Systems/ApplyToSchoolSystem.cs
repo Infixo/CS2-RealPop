@@ -15,12 +15,13 @@ using UnityEngine.Scripting;
 using Game;
 using Game.Simulation;
 
-namespace RealPop.Systems;
-
-[CompilerGenerated]
-public class ApplyToSchoolSystem_RealPop : GameSystemBase
+namespace RealPop.Systems
 {
-    [BurstCompile]
+
+//[CompilerGenerated]
+public partial class ApplyToSchoolSystem_RealPop : GameSystemBase
+{
+    //[BurstCompile]
     public struct ApplyToSchoolJob : IJobChunk
     {
         [ReadOnly]
@@ -285,7 +286,7 @@ public class ApplyToSchoolSystem_RealPop : GameSystemBase
         RequireForUpdate(m_CitizenGroup);
         RequireForUpdate<EconomyParameterData>();
         RequireForUpdate<TimeData>();
-        Plugin.Log("Modded ApplyToSchoolSystem created.");
+        Mod.log.Info("Modded ApplyToSchoolSystem created.");
     }
 
     [Preserve]
@@ -406,3 +407,4 @@ public class ApplyToSchoolSystem_RealPop : GameSystemBase
     {
     }
 }
+} // namespace

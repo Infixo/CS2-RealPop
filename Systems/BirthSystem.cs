@@ -20,12 +20,13 @@ using UnityEngine.Scripting;
 using Game;
 using Game.Simulation;
 
-namespace RealPop.Systems;
-
-[CompilerGenerated]
-public class BirthSystem_RealPop : GameSystemBase
+namespace RealPop.Systems
 {
-    [BurstCompile]
+
+//[CompilerGenerated]
+public partial class BirthSystem_RealPop : GameSystemBase
+{
+    //[BurstCompile]
     private struct CheckBirthJob : IJobChunk
     {
         public NativeCounter.Concurrent m_DebugBirthCounter;
@@ -191,7 +192,7 @@ public class BirthSystem_RealPop : GameSystemBase
         }
     }
 
-    [BurstCompile]
+    //[BurstCompile]
     private struct SumBirthJob : IJob
     {
         public NativeCounter m_DebugBirthCount;
@@ -294,13 +295,13 @@ public class BirthSystem_RealPop : GameSystemBase
         RequireForUpdate(m_CitizenQuery);
         // RealPop
         m_TimeDataQuery = GetEntityQuery(ComponentType.ReadOnly<TimeData>());
-        s_NoChildrenWhenTooOld = Plugin.NoChildrenWhenTooOld.Value;
+        s_NoChildrenWhenTooOld = Mod.setting.NoChildrenWhenTooOld;
         // rescale birth chance if NoChildrenWhenTooOld is OFF - more time to give birth, so chance is cut down
         int ratio = s_NoChildrenWhenTooOld ? 100 : 100*(AgingSystem_RealPop.GetElderAgeLimitInDays() - 2 * AgingSystem_RealPop.GetAdultAgeLimitInDays()) / (AgingSystem_RealPop.GetElderAgeLimitInDays() - AgingSystem_RealPop.GetAdultAgeLimitInDays());
-        s_BirthChanceSingle = Plugin.BirthChanceSingle.Value * ratio / 100;
-        s_BirthChanceFamily = Plugin.BirthChanceFamily.Value * ratio / 100;
-        s_NextBirthChance = Plugin.NextBirthChance.Value;
-        Plugin.Log($"Modded BirthSystem created. BirthChances={s_BirthChanceSingle}/{s_BirthChanceFamily}, NextBirthChance={s_NextBirthChance}, NoChildrenWhenTooOld={s_NoChildrenWhenTooOld} (ratio {ratio}).");
+        s_BirthChanceSingle = Mod.setting.BirthChanceSingle * ratio / 100;
+        s_BirthChanceFamily = Mod.setting.BirthChanceFamily * ratio / 100;
+        s_NextBirthChance = Mod.setting.NextBirthChance;
+        Mod.log.Info($"Modded BirthSystem created. BirthChances={s_BirthChanceSingle}/{s_BirthChanceFamily}, NextBirthChance={s_NextBirthChance}, NoChildrenWhenTooOld={s_NoChildrenWhenTooOld} (ratio {ratio}).");
     }
 
     [Preserve]
@@ -371,3 +372,5 @@ public class BirthSystem_RealPop : GameSystemBase
     {
     }
 }
+
+} // namespace

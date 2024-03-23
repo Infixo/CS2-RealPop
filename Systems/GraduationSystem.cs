@@ -13,16 +13,17 @@ using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Scripting;
-using BepInEx.Configuration;
+//using BepInEx.Configuration;
 using Game;
 using Game.Simulation;
 
-namespace RealPop.Systems;
-
-[CompilerGenerated]
-public class GraduationSystem_RealPop : GameSystemBase
+namespace RealPop.Systems
 {
-    [BurstCompile]
+
+//[CompilerGenerated]
+public partial class GraduationSystem_RealPop : GameSystemBase
+{
+    //[BurstCompile]
     public struct GraduationJob : IJobChunk
     {
         [ReadOnly]
@@ -387,14 +388,14 @@ public class GraduationSystem_RealPop : GameSystemBase
         RequireForUpdate<EconomyParameterData>();
         RequireForUpdate<TimeData>();
         // RealPop
-        s_Education2InDays = Plugin.Education2InDays.Value;
-        s_Education3InDays = Plugin.Education3InDays.Value;
-        s_Education4InDays = Plugin.Education4InDays.Value;
-        s_GraduationLevel1 = Plugin.GraduationLevel1.Value;
-        s_GraduationLevel2 = Plugin.GraduationLevel2.Value;
-        s_GraduationLevel3 = Plugin.GraduationLevel3.Value;
-        s_GraduationLevel4 = Plugin.GraduationLevel4.Value;
-        Plugin.Log($"Modded GraduationSystem created. School days: {s_Education2InDays}, {s_Education3InDays}, {s_Education4InDays}. Graduation params: {s_GraduationLevel1}, {s_GraduationLevel2}, {s_GraduationLevel3}, {s_GraduationLevel4}");
+        s_Education2InDays = Mod.setting.Education2InDays;
+        s_Education3InDays = Mod.setting.Education3InDays;
+        s_Education4InDays = Mod.setting.Education4InDays;
+        s_GraduationLevel1 = Mod.setting.GraduationLevel1;
+        s_GraduationLevel2 = Mod.setting.GraduationLevel2;
+        s_GraduationLevel3 = Mod.setting.GraduationLevel3;
+        s_GraduationLevel4 = Mod.setting.GraduationLevel4;
+        Mod.log.Info($"Modded GraduationSystem created. Graduation params: {s_GraduationLevel1}, {s_GraduationLevel2}, {s_GraduationLevel3}, {s_GraduationLevel4}.");
     }
 
     [Preserve]
@@ -474,3 +475,5 @@ public class GraduationSystem_RealPop : GameSystemBase
     {
     }
 }
+
+} // namespace

@@ -13,12 +13,13 @@ using UnityEngine.Scripting;
 using Game;
 using Game.Citizens;
 
-namespace RealPop.Systems;
-
-[CompilerGenerated]
-public class CitizenInitializeSystem_RealPop : GameSystemBase
+namespace RealPop.Systems
 {
-    [BurstCompile]
+
+//[CompilerGenerated]
+public partial class CitizenInitializeSystem_RealPop : GameSystemBase
+{
+    //[BurstCompile]
     private struct InitializeCitizenJob : IJob
     {
         [DeallocateOnJobCompletion]
@@ -342,14 +343,14 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
         // RealPop
         m_CountFreeWorkplacesSystem = base.World.GetOrCreateSystemManaged<CountFreeWorkplacesSystem>();
         m_CountStudyPositionsSystem = base.World.GetOrCreateSystemManaged<CountStudyPositionsSystem>();
-        s_NewAdultsAnyEducation = Plugin.NewAdultsAnyEducation.Value;
-        s_NoChildrenWhenTooOld = Plugin.NoChildrenWhenTooOld.Value;
-        s_AllowTeenStudents = Plugin.AllowTeenStudents.Value;
-        s_Education2InDays = Plugin.Education2InDays.Value;
-        s_Education3InDays = Plugin.Education3InDays.Value;
+        s_NewAdultsAnyEducation = Mod.setting.NewAdultsAnyEducation;
+        s_NoChildrenWhenTooOld = Mod.setting.NoChildrenWhenTooOld;
+        s_AllowTeenStudents = Mod.setting.AllowTeenStudents;
+        s_Education2InDays = Mod.setting.Education2InDays;
+        s_Education3InDays = Mod.setting.Education3InDays;
         int teenAge = AgingSystem_RealPop.GetTeenAgeLimitInDays();
         s_TeenSpawnPercentage = 1f - (float)teenAge / (float)(teenAge + s_Education2InDays);
-        Plugin.Log($"Modded CitizenInitializeSystem created. NewAdultsAnyEducation={s_NewAdultsAnyEducation}, NoChildrenWhenTooOld={s_NoChildrenWhenTooOld}, AllowTeenStudents={s_AllowTeenStudents}, TeenSpawnPercentage={100f*s_TeenSpawnPercentage:F0}");
+        Mod.log.Info($"Modded CitizenInitializeSystem created. NewAdultsAnyEducation={s_NewAdultsAnyEducation}, NoChildrenWhenTooOld={s_NoChildrenWhenTooOld}, AllowTeenStudents={s_AllowTeenStudents}, TeenSpawnPercentage={100f*s_TeenSpawnPercentage:F0}");
     }
 
     [Preserve]
@@ -439,3 +440,5 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
     {
     }
 }
+
+} // namespace

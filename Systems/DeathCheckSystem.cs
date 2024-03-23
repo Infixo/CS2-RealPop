@@ -22,12 +22,13 @@ using UnityEngine.Scripting;
 using Game;
 using Game.Simulation;
 
-namespace RealPop.Systems;
-
-[CompilerGenerated]
-public class DeathCheckSystem_RealPop : GameSystemBase
+namespace RealPop.Systems
 {
-    [BurstCompile]
+
+//[CompilerGenerated]
+public partial class DeathCheckSystem_RealPop : GameSystemBase
+{
+    //[BurstCompile]
     private struct DeathCheckJob : IJobChunk
     {
         [ReadOnly]
@@ -399,10 +400,10 @@ public class DeathCheckSystem_RealPop : GameSystemBase
         RequireForUpdate(m_DeathCheckQuery);
         RequireForUpdate(m_HealthcareSettingsQuery);
         // RealPop
-        s_DeathStartAge = Plugin.ElderAgeLimitInDays.Value;
-        s_DeathChanceIncrease = Plugin.DeathChanceIncrease.Value;
-        s_CorpseVanishChance = Plugin.CorpseVanishChance.Value;
-        Plugin.Log($"Modded DeathCheckSystem created. DeathStartAge={s_DeathStartAge}, DeathChanceIncrease={s_DeathChanceIncrease}, CorpseVanishChance={s_CorpseVanishChance}.");
+        s_DeathStartAge = Mod.setting.ElderAgeLimitInDays;
+        s_DeathChanceIncrease = Mod.setting.DeathChanceIncrease;
+        s_CorpseVanishChance = Mod.setting.CorpseVanishChance;
+        Mod.log.Info($"Modded DeathCheckSystem created. DeathStartAge={s_DeathStartAge}, DeathChanceIncrease={s_DeathChanceIncrease}, CorpseVanishChance={s_CorpseVanishChance}.");
     }
 
     [Preserve]
@@ -501,3 +502,5 @@ public class DeathCheckSystem_RealPop : GameSystemBase
     {
     }
 }
+
+} // namespace

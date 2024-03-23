@@ -22,12 +22,13 @@ using UnityEngine.Scripting;
 using Game;
 using Game.Simulation;
 
-namespace RealPop.Systems;
+namespace RealPop.Systems
+{
 
 [CompilerGenerated]
-public class CountHomesSystem : GameSystemBase
+public partial class CountHomesSystem : GameSystemBase
 {
-    [BurstCompile]
+    //[BurstCompile]
     private struct CountResidentialPropertiesJob : IJob
     {
         [ReadOnly]
@@ -286,7 +287,7 @@ public class CountHomesSystem : GameSystemBase
         m_FreeProperties = new NativeValue<int>(Allocator.Persistent);
         m_TotalProperties.value = -1;
         m_FreeProperties.value = -1;
-        Plugin.Log($"CountHomesSystem created. FreeRatioTreshold={Plugin.FreeRatioTreshold.Value}, FreeRatioFullSpeed={Plugin.FreeRatioFullSpeed.Value}.");
+        Mod.log.Info($"CountHomesSystem created. FreeRatioTreshold={Mod.setting.FreeRatioTreshold}, FreeRatioFullSpeed={Mod.setting.FreeRatioFullSpeed}.");
     }
 
     [Preserve]
@@ -369,3 +370,5 @@ public class CountHomesSystem : GameSystemBase
     {
     }
 }
+
+} // namespace

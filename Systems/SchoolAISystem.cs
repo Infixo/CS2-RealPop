@@ -15,12 +15,13 @@ using UnityEngine.Scripting;
 using Game;
 using Game.Simulation;
 
-namespace RealPop.Systems;
-
-[CompilerGenerated]
-public class SchoolAISystem_RealPop : GameSystemBase
+namespace RealPop.Systems
 {
-    [BurstCompile]
+
+//[CompilerGenerated]
+public partial class SchoolAISystem_RealPop : GameSystemBase
+{
+    //[BurstCompile]
     private struct SchoolTickJob : IJobChunk
     {
         [ReadOnly]
@@ -123,11 +124,11 @@ public class SchoolAISystem_RealPop : GameSystemBase
                                 {
                                     // school min years
                                     if (componentData2.m_Level == 2)
-                                        num += (float)Plugin.Education2InDays.Value;
+                                        num += s_Education2InDays;
                                     else if (componentData2.m_Level == 3)
-                                        num += (float)Plugin.Education3InDays.Value;
+                                        num += s_Education3InDays;
                                     else
-                                        num += (float)Plugin.Education4InDays.Value;
+                                        num += s_Education4InDays;
                                     // failed years
                                     num += (float)failedEducationCount;
                                     // part still ahead; for simplicity it assumes 1 extra attempt
@@ -258,6 +259,10 @@ public class SchoolAISystem_RealPop : GameSystemBase
 
     private EntityQuery __query_1235104412_2;
 
+    private static float s_Education2InDays; // high school
+    private static float s_Education3InDays; // college
+    private static float s_Education4InDays; // university
+
     public override int GetUpdateInterval(SystemUpdatePhase phase)
     {
         return 256;
@@ -280,7 +285,11 @@ public class SchoolAISystem_RealPop : GameSystemBase
         RequireForUpdate<EconomyParameterData>();
         RequireForUpdate<EducationParameterData>();
         RequireForUpdate<TimeData>();
-        Plugin.Log("Modded SchoolAISystem created.");
+        // RealPop
+        s_Education2InDays = Mod.setting.Education2InDays;
+        s_Education3InDays = Mod.setting.Education3InDays;
+        s_Education4InDays = Mod.setting.Education4InDays;
+        Mod.log.Info($"Modded SchoolAISystem created. School days: {s_Education2InDays}, {s_Education3InDays}, {s_Education4InDays}.");
     }
 
     [Preserve]
@@ -367,3 +376,5 @@ public class SchoolAISystem_RealPop : GameSystemBase
     {
     }
 }
+
+} // namespace
