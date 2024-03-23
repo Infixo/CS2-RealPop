@@ -1,13 +1,11 @@
 using System.Runtime.CompilerServices;
 using Colossal.Collections;
-using Game;
 using Game.Buildings;
 using Game.Citizens;
 using Game.City;
 using Game.Common;
 using Game.Prefabs;
 using Game.Triggers;
-using Game.Simulation;
 using Unity.Burst;
 using Unity.Burst.Intrinsics;
 using Unity.Collections;
@@ -16,6 +14,8 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Scripting;
 using BepInEx.Configuration;
+using Game;
+using Game.Simulation;
 
 namespace RealPop.Systems;
 

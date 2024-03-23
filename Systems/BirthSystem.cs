@@ -111,8 +111,8 @@ public class BirthSystem_RealPop : GameSystemBase
             NativeArray<Citizen> nativeArray2 = chunk.GetNativeArray(ref m_CitizenType);
             NativeArray<HouseholdMember> nativeArray3 = chunk.GetNativeArray(ref m_MemberType);
             Random random = m_RandomSeed.GetRandom(unfilteredChunkIndex);
-            int day = TimeSystem.GetDay(m_SimulationFrame, m_TimeData);
-            int birthMaxAge = AgingSystem_RealPop.GetElderAgeLimitInDays() - AgingSystem_RealPop.GetAdultAgeLimitInDays();
+            int day = TimeSystem.GetDay(m_SimulationFrame, m_TimeData); // RealPop
+            int birthMaxAge = AgingSystem_RealPop.GetElderAgeLimitInDays() - AgingSystem_RealPop.GetAdultAgeLimitInDays(); // RealPop
             for (int i = 0; i < nativeArray.Length; i++)
             {
                 Entity entity = nativeArray[i];

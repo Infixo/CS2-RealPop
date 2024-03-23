@@ -40,39 +40,41 @@ Version 0.7 introduces a new death process. There will be more deaths! Please re
   - Introduces configurable params to control birth process, BirthChanceSingle, BirthChanceFamily and NextBirthChance. You can define a base chance to have a baby for a single mother, a family and decrease in chance with each consecutive baby.
   - The chance of having a baby is halved also when a father is a student.
   - The below picture shows Vanilla and modded distribution of families in the game. The vanilla curve is rather flat and symmetrical, produces on average 3.8 children in a family and allows for huge families like 6+ children. Modded curve is tilted towards lower number of children and chances of getting bigger families drop with every new child. On average, it results in 2.3 children per family.
-  - Please note that as a result of all the above changes, the birth rate will be lower that in the vanilla game, at approx. 2/3.
+  - Please note that as a result of all the above changes, the birth rate will be lower than in the vanilla game, at approx. 2/3.
 
 ![Children](https://raw.githubusercontent.com/infixo/cs2-realpop/master/docs/children.png)
 
 ### New households limiter (v0.6)
-  - Limits spawning of new households when the number of empty properties falls below a configurable treshold (by default 2,5%). This allows for Teens becoming new Adults have a chance to actually find a property. In Vanilla game, new households spawn so fast that they occupy all available buildings and new adults are forced to leave the city.
+  - Limits spawning of new households when the number of empty properties falls below a configurable treshold (by default 1,5%). This allows for Teens becoming new Adults have a chance to actually find a property. In Vanilla game, new households spawn so fast that they occupy all available buildings and new adults are forced to leave the city.
   - As a result it **heavily reduces the number of cims Moving Away**.
   - The feature can be turned off by setting the option FreeRatioTreshold to -1.
-  - (v0.8) The limiter is dynamic, the more empty homes, the faster new cims will spawn. By default at 7,5% they will spawn at full speed (set via FreeRatioFullSpeed config parameter).
+  - (v0.8) The limiter is dynamic, the more empty homes, the faster new cims will spawn. By default at 6,0% they will spawn at full speed (set via FreeRatioFullSpeed config parameter).
   
 ### Updated death process (v0.7)
   - Cims will have a chance to die of old age once they become Elders. In vanilla game they start dying at 108 days.
   - The chance of death increases with age, by a factor set in the config file (parameter DeathChanceIncrease). In vanilla game they all die within 12 days.
   - You may turn off this new process and use vanilla logic by setting DeathChanceIncrease to 0.
   - Warning! There will be much more deaths than in vanilla game and you need to expand your Deathcare. In vanilla Seniors usually leave the city due to rent problems long before they reach the dying treshold, so there is not much use for a Deathcare.
-  - (v0.8) Corpses have a default chance of 30% to vanish, so there will be less need for Deathcare (use config param CorpseVanishChance to change that).
+  - (v0.8) Corpses have a default chance of 50% to vanish, so there will be less need for Deathcare (use config param CorpseVanishChance to change that).
 
 ## Technical
 
 ### Requirements and Compatibility
-- Cities Skylines II version 1.0.19f1 or later; check GitHub or Discord if the mod is compatible with the latest game version.
+- Cities Skylines II version 1.1.0f1 or later; check GitHub or Discord if the mod is compatible with the latest game version.
 - BepInEx 5.
 - Modified systems: AgingSystem, ApplyToSchoolSystem, BirthSystem, CitizenInitializeSystem, DeathCheckSystem, GraduationSystem, SchoolAISystem.
 - Cim Behavior Improvements is not compatible (both modify ApplyToSchoolSystem and BirthSystem).
 
 ### Installation
 1. Place the `RealPop.dll` file in your BepInEx `Plugins` folder.
-2. The config file is automatically created (in BepInEx\config) when the game is run once.
+2. The BepInEx config file `RealPop.cfg` is automatically created in BepInEx\config when the game is run once.
 
 ### Known Issues
 - Nothing atm.
 
 ### Changelog
+- v0.9.0 (2024-03-20)
+  - Updated for v1.1.0 of the game.
 - v0.8.1 (2024-03-05)
   - Fixes game issue where new Households could spawn with a negative balance (as low as -300); now they spawn with balance betwen 2000 and 3000.
   - Fixed issue with Uneducated cims coming even when there is no jobs for them.

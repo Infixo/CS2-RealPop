@@ -1,19 +1,19 @@
 using System.Runtime.CompilerServices;
 using Colossal.Collections;
-using Game;
 using Game.Buildings;
 using Game.Citizens;
 using Game.City;
 using Game.Common;
 using Game.Prefabs;
 using Game.Tools;
-using Game.Simulation;
 using Unity.Burst;
 using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine.Scripting;
+using Game;
+using Game.Simulation;
 
 namespace RealPop.Systems;
 
@@ -164,6 +164,8 @@ public class SchoolAISystem_RealPop : GameSystemBase
                     reference.m_AverageGraduationTime = 0.5f - 1f / math.log2(1f - math.saturate(graduationProbability2));
                     reference.m_AverageFailProbability = 0f;
                 }
+                reference.m_StudentWellbeing = (sbyte)math.clamp((int)math.round(efficiency * (float)componentData.m_StudentWellbeing), -100, 100);
+                reference.m_StudentHealth = (sbyte)math.clamp((int)math.round(efficiency * (float)componentData.m_StudentHealth), -100, 100);
             }
         }
 

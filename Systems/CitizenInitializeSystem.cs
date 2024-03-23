@@ -203,6 +203,7 @@ public class CitizenInitializeSystem_RealPop : GameSystemBase
                 {
                     // Infixo: these are CHILDREN in households
                     float studyWillingness = citizen.GetPseudoRandom(CitizenPseudoRandom.StudyWillingness).NextFloat();
+					// RealPop: uses mod's teen spawn percentage
                     if (random.NextFloat(1f) > s_TeenSpawnPercentage)
                     {
                         // Infixo: spawn CHILD

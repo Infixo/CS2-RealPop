@@ -1,5 +1,4 @@
 using System.Runtime.CompilerServices;
-using Game;
 using Game.Agents;
 using Game.Buildings;
 using Game.Citizens;
@@ -7,13 +6,14 @@ using Game.City;
 using Game.Common;
 using Game.Economy;
 using Game.Prefabs;
-using Game.Simulation;
 using Unity.Burst;
 using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine.Scripting;
+using Game;
+using Game.Simulation;
 
 namespace RealPop.Systems;
 

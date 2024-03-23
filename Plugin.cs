@@ -2,13 +2,13 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Collections.Generic;
+using System.Text;
+using Colossal.Logging;
 using BepInEx;
 using BepInEx.Logging;
 using BepInEx.Configuration;
 using HarmonyLib;
-using System.Collections.Generic;
-using System.Text;
-using Colossal.Logging;
 
 #if BEPINEX_V6
     using BepInEx.Unity.Mono;
@@ -48,7 +48,7 @@ public class Plugin : BaseUnityPlugin
         return mb.DeclaringType + "." + mb.Name;
     }
 
-    // mod settings
+    // Mod settings
     public static ConfigEntry<int> TeenAgeLimitInDays;
 	public static ConfigEntry<int> AdultAgeLimitInDays;
 	public static ConfigEntry<int> ElderAgeLimitInDays;
@@ -76,7 +76,8 @@ public class Plugin : BaseUnityPlugin
 
         // CO logging standard as described here https://cs2.paradoxwikis.com/Logging
         s_Log = LogManager.GetLogger(MyPluginInfo.PLUGIN_NAME);
-
+		
+		// Mod settings
         TeenAgeLimitInDays = base.Config.Bind<int>("Lifecycle", "TeenAgeLimitInDays", 12, "When Children become Teens; Vanilla 21");
         AdultAgeLimitInDays = base.Config.Bind<int>("Lifecycle", "AdultAgeLimitInDays", 20, "When Teens become Adults; Vanilla 36");
         ElderAgeLimitInDays = base.Config.Bind<int>("Lifecycle", "ElderAgeLimitInDays", 75, "When Adults become Seniors; Vanilla 84");
@@ -85,18 +86,18 @@ public class Plugin : BaseUnityPlugin
         Education4InDays = base.Config.Bind<int>("Schools", "Education4InDays", 5, "How long University should typically last (only for Adults)");
         GraduationLevel1 = base.Config.Bind<float>("Graduation", "Level1", 90f, "Elementary School; Vanilla 100");
         GraduationLevel2 = base.Config.Bind<float>("Graduation", "Level2", 80f, "High School; Vanilla 60");
-        GraduationLevel3 = base.Config.Bind<float>("Graduation", "Level3", 80f, "College; Vanilla 90");
-        GraduationLevel4 = base.Config.Bind<float>("Graduation", "Level4", 70f, "University; Vanilla 70");
+        GraduationLevel3 = base.Config.Bind<float>("Graduation", "Level3", 70f, "College; Vanilla 90");
+        GraduationLevel4 = base.Config.Bind<float>("Graduation", "Level4", 60f, "University; Vanilla 70");
         NewAdultsAnyEducation = base.Config.Bind<bool>("NewCims", "NewAdultsAnyEducation", true, "Allow for newly spawned Adults and Seniors to have any education level; Vanilla allows only Educated");
         NoChildrenWhenTooOld = base.Config.Bind<bool>("NewCims", "NoChildrenWhenTooOld", true, "Does not allow for Adults to have Children when they cannot raise them before becoming Senior; Vanilla doesn't have such a restriction");
         AllowTeenStudents = base.Config.Bind<bool>("NewCims", "AllowTeenStudents", true, "Allow for Teens ready for College to be spawned as Students; Vanilla spawns always Adults");
         BirthChanceSingle = base.Config.Bind<int>("Birth", "BirthChanceSingle", 35, "Base birth chance for a Single, rolled against 16000, 16x per day; Vanilla 20");
         BirthChanceFamily = base.Config.Bind<int>("Birth", "BirthChanceFamily", 120, "Base birth chance for a Family, rolled against 16000, 16x per day; Vanilla 100");
         NextBirthChance = base.Config.Bind<int>("Birth", "NextBirthChance", 97, "Set to less than 100 to lower the birth chance for each consecutive child; Vanilla 100");
-        FreeRatioTreshold = base.Config.Bind<int>("NewCims", "FreeRatioTreshold", 20, "Treshold for free properties ratio to start spawning new households (in 1/1000); Vanilla has no restrictions, set to -1 to turn off");
+        FreeRatioTreshold = base.Config.Bind<int>("NewCims", "FreeRatioTreshold", 15, "Treshold for free properties ratio to start spawning new households (in 1/1000); Vanilla has no restrictions, set to -1 to turn off");
         FreeRatioFullSpeed = base.Config.Bind<int>("NewCims", "FreeRatioFullSpeed", 60, "Treshold for free properties ratio to spawn new households at full speed (in 1/1000); Vanilla has no restrictions");
         DeathChanceIncrease = base.Config.Bind<int>("Lifecycle", "DeathChanceIncrease", 3, "Increase in death chance per mille per year; set to 0 to turn off and use Vanilla process");
-        CorpseVanishChance = base.Config.Bind<int>("Lifecycle", "CorpseVanishChance", 40, "Percent chance for a corpse to vanish after death; Vanilla has no such feature, set to 0 to turn off");
+        CorpseVanishChance = base.Config.Bind<int>("Lifecycle", "CorpseVanishChance", 50, "Percent chance for a corpse to vanish after death; Vanilla has no such feature, set to 0 to turn off");
 
         Log($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
 
