@@ -31,6 +31,12 @@ namespace RealPop
             SetDefaults();
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether: Used to force saving of Modsettings if settings would result in empty Json.
+        /// </summary>
+        [SettingsUIHidden]
+        public bool _Hidden { get; set; }
+
         // POPULATION
 
         // [Lifecycle]
@@ -138,6 +144,7 @@ namespace RealPop
 
         public override void SetDefaults()
         {
+            _Hidden = true;
             // Lifecycle
             TeenAgeLimitInDays = 12; // Vanilla 21
             AdultAgeLimitInDays = 20; // Vanilla 36
