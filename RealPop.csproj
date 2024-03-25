@@ -4,6 +4,7 @@
 		<OutputType>Library</OutputType>
 		<TargetFramework>net472</TargetFramework>
 		<Configurations>Debug;Release</Configurations>
+		<Version>0.9.0</Version>
 		
 		<!--The folder where Game.dll is located. Set it only if the game is not installed in the default location, otherwise keep it empty-->
 		<CustomManagedPath>C:\Steam\steamapps\common\Cities Skylines II\Cities2_Data\Managed</CustomManagedPath>
@@ -97,15 +98,7 @@
 	
 	<!-- Harmony -->
 	<ItemGroup>
-		<PackageReference Include="HarmonyX" Version="2.10.2"></PackageReference>
+		<PackageReference Include="Lib.Harmony" Version="2.2.2" />
 	</ItemGroup>
-	
-
-	<Target Name="YourCustomDeploy" AfterTargets="DeployWIP">
-		<ItemGroup>
-			<AdditionalFilesToDeploy Include="Patches\0Harmony.dll" />
-		</ItemGroup>
-		<Copy SourceFiles="@(AdditionalFilesToDeploy)" DestinationFolder="$(DeployDir)" />
-	</Target>
 
 </Project>

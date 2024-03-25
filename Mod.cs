@@ -53,11 +53,10 @@ namespace RealPop
             RealPopPatches.Initialize_Postfix(updateSystem); // reuse existing code
 
             // Harmony
-            var harmony = Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), harmonyID);
+            var harmony = new Harmony(harmonyID);
+            harmony.PatchAll(typeof(Mod).Assembly);
             var patchedMethods = harmony.GetPatchedMethods().ToArray();
-
             log.Info($"Plugin {harmonyID} made patches! Patched methods: " + patchedMethods.Length);
-
             foreach (var patchedMethod in patchedMethods)
             {
                 log.Info($"Patched method: {patchedMethod.Module.Name}:{patchedMethod.Name}");
@@ -73,6 +72,10 @@ namespace RealPop
         public void OnDispose()
         {
             log.Info(nameof(OnDispose));
+            // Harmony
+            var harmony = new Harmony(harmonyID);
+            harmony.UnpatchAll(harmonyID);
+            // Setting
             if (setting != null)
             {
                 setting.UnregisterInOptionsUI();

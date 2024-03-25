@@ -1,33 +1,69 @@
 ﻿<Publish>
 	<!--Id must be set in order to update existed mod. it is not required for publishing mod for the first time-->
-	<ModId Value="" />
+	<ModId Value="76037" />
 	<!--Name of the mod to display to players-->
-	<DisplayName Value="RealPop" />
+	<DisplayName Value="Population Rebalance" />
 	<!--Short description of the mod-->
 	<ShortDescription Value="Tweaks cims' lifecycle for more balanced population and education needs." />
 	<!--Long description of the mod. Single line or multi line. Supports minimal markdown subset-->
 	<!--LongDescription Value="Tweaks cims' lifecycle for more balanced population and education needs." /-->
 	<LongDescription>
 Tweaks cims' lifecycle for more balanced population and education needs.
+
+## Features
+
+The mod has **many** features, most of them are **configurable**. Please see GitHub page for details and full description of features and parameters. The below list is only a short overview.
+
+* **Lifecycle adjustments:** Default thresholds for licycle stages are changed from 21/36/84 to 12/20/75. This gives more realistic population structure.
+* **Graduation logic:** Graduation process is more restrictive. Cims following typical education path will spend more time in High School, College and University.
+* **New households:** Several fixes e.g. CoupleHousehold having only 1 Adult will now have 2 Adults. Fixes bugs where Children and Teens are all spawned with age 0 and all StudentHousehold are single Adults at age 36.
+* **Dynamic education levels:** Until the first College is built, the cims will have an education adjusted to open jobs.
+* **Birth process:** Adults cannot have children if they won't be able to raise them before becoming Seniors. Changes distribution of families towards less children, also lowers chances for consecutive children.
+* **New Households limiter:** Limits spawning of new households when the number of empty properties falls below a configurable treshold (by default 1,5%). This allows for new Adults to have a chance to actually find a property.
+* **Death process:** Cims will have a chance to die of old age once they become Elders. The chance of death increases with age.
+* **Corpse removal:** Corpses have 50% chance to vanish.
+
+## Comparison to the Vanilla game
+
+* Less Elementary Schools, more High Schools and Colleges.
+* Heavily reduced number of cims leaving the city (Moving Away).
+* Number of cims incoming to the city will depend on ratio of free properties.
+* There will always be free residential properties for new Adults.
+* Less births (approx. 2/3 of vanilla level), much more deaths (approx. 3x more).
+
+## Technical
+
+* The options are applied only once, during the mod initialization. For new setting to take effect, you need to **restart the game**.
+* Modified systems: AgingSystem, ApplyToSchoolSystem, BirthSystem, CitizenInitializeSystem, DeathCheckSystem, GraduationSystem, SchoolAISystem.
+
+## Important Notes
+
+* It will take one full in-game day for the population to adjust to the new thresholds. Education changes need more time, at least 3-5 days. You may wanna build a few extra High Schools until the levels will adjust.
+* Cims cannot go back to the previous phase of their lives, so changes done by this mod are irreversible. Make sure to have a savefile. Once the mod is deactivated, cims will follow default logic, so eventually the city will return to the vanilla state, but it will take several in-game days.
+* The timeline in CS2 is measured in days. Each in-game day also represents 1 month (e.g. when looking at average time spent in schools) and at the same time 1 year of the cim life. Cims live around 100 days, give or take few, so it is pretty close to average human lifespan.
+* The population structure is based on EU statistics data, population by age. 0-14 years is ~15%, which we can consider Children in CS2 reality. 15-24 years is 11%, which we can consider Teens. And 65+ years is 21%, which we can consider Seniors (65 is usual retirement age in EU). The rest are Adults.
 	</LongDescription>
 	<!--Thumbnail-->
 	<Thumbnail Value="Properties/Thumbnail.png" />
 	<!--Screenshot, can be set multiple times-->
-	<Screenshot Value="" />
+	<Screenshot Value="docs/pop_change.png" />
+	<Screenshot Value="docs/edu_change.png" />
 	<!--Tag, can be set multiple times-->
-	<Tag Value="" />
+	<Tag Value="Code Mod" />
 	<!--Link to the forum post where the mod can be discussed-->
 	<ForumLink Value="" />
 	<!--Version of the mod-->
-	<ModVersion Value="1.0" />
+	<ModVersion Value="0.9.1" />
 	<!--Recommended version of the base game to use the mod-->
-	<GameVersion Value="1.0.*" />
+	<GameVersion Value="1.1.*" />
 	<!--Dependency for the mod, can be set multiple times-->
 	<Dependency Id="" />
 	<!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
-	<ChangeLog Value="" />
-	<!--ChangeLog>
-	</ChangeLog-->
+	<!--<ChangeLog Value="v0.9.0 (2024-03-24) Mod ported to the official platform and updated for v1.1.0 of the game." />-->
+	<ChangeLog>
+v0.9.0 (2024-03-24)
+* Mod migrated to PDXMods platform and updated for v1.1.0 of the game.
+	</ChangeLog>
 	<!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon-->
-	<ExternalLink Type="" Url="" />
+	<ExternalLink Type="github" Url="https://github.com/Infixo/CS2-RealPop" />
 </Publish>
