@@ -57,10 +57,12 @@ The mod has **many** features, most of them are **configurable**. Please see Git
 	<!--Recommended version of the base game to use the mod-->
 	<GameVersion Value="1.1.*" />
 	<!--Dependency for the mod, can be set multiple times-->
-	<Dependency Id="" />
+	<Dependency Id="77225" /> <!-- Gooee -->
 	<!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
 	<!--<ChangeLog Value="v0.9.0 (2024-03-24) Mod ported to the official platform and updated for v1.1.0 of the game." />-->
 	<ChangeLog>
+v0.9.3 (2024-08-04)
+* Added dependency on Gooee mod. Ensuring it will load in Cities Skylines 2 from 1.1.7f1 version onwards.
 v0.9.2 (2024-04-03)
 * Added compatibility with Economy Rebalance.
 v0.9.0 (2024-03-24)
